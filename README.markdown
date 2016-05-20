@@ -1,5 +1,7 @@
 # pam_pkcs11
 
+[![Build Status](https://travis-ci.org/lamawithonel/puppet-pam_pkcs11.svg?branch=master)](https://travis-ci.org/lamawithonel/puppet-pam_pkcs11)
+
 #### Table of Contents
 
 1. [Description](#description)
