@@ -1,0 +1,47 @@
+########################################################################
+#             WARNING: This file is managed by Puppet.                 #
+#               Manual changes will be overwritten.                    #
+########################################################################
+pam_pkcs11 {
+  debug             = <%= @debug.to_s -%>;
+
+  nullok            = <%= @nullok.to_s -%>;
+  use_first_pass    = <%= @use_first_pass.to_s -%>;
+  try_first_pass    = <%= @try_first_pass.to_s -%>;
+  use_authtok       = <%= @use_authtok.to_s -%>;
+
+  card_only         = <%= @card_only.to_s -%>;
+  wait_for_card     = <%= @wait_for_card.to_s -%>;
+
+  use_pkcs11_module = "<%= @merged_pkcs11_module['name'] -%>";
+
+  pkcs11_module <%= @merged_pkcs11_module['name'] -%> {
+<% @merged_pkcs11_module.keys.sort.each do |key| -%>
+<%   value = @merged_pkcs11_module[key] -%>
+<%   next if value.is_a?(NilClass) || value.to_s == 'undef' || key == 'name'-%>
+<%   value.is_a?(String) && ! value.match('^[[:digit:]]+$') ? val = "\"#{value}\"" : val = value ;-%>
+    <%= key.to_s -%> = <%= val.to_s -%>;
+<% end -%>
+  }
+
+<% @use_mappers.each do |mapper| -%>
+<%   if ! mapper.is_a?(String) then raise Puppet::Error.new("#{v} is not a string.") end -%>
+<%   if mapper !~ /^(?:generic|subject|openssh|opensc|pwent|null|ldap|cn|mail|ms|krb|uid|digest)$/ -%>
+<%     raise Puppet::Error.new("#{mapper} does not match '^(?:generic|subject|openssh|opensc|pwent|null|ldap|cn|mail|ms|krb|uid|digest)$'") -%>
+<%   end -%>
+<% end -%>
+  use_mappers = "<%= @use_mappers.join(', ') -%>";
+
+<% @merged_mapper_options.keys.sort.each do |mapper_name| -%>
+<%   options = @merged_mapper_options[mapper_name] -%>
+  mapper <%= mapper_name -%> {
+<%   options.keys.sort.each do |key| -%>
+<%     value = options[key] -%>
+<%     next if value.is_a?(NilClass) || value.to_s == 'undef' -%>
+<%     value.is_a?(String) && ! value.match('^[[:digit:]]+$') ? val = "\"#{value}\"" : val = value -%>
+    <%= key.to_s -%> = <%= val.to_s -%>;
+<% end -%>
+  }
+
+<% end -%>
+}

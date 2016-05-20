@@ -1,0 +1,6 @@
+<% @uid_mappings.each do |k,v| -%>
+<%   if ! v.is_a?(String) then raise Puppet::Error.new("#{v} is not a string.") end -%>
+<% end -%>
+<% @uid_mappings.keys.sort.each do |uid| -%>
+<%=   "#{@uid_mappings[uid]} -> #{uid}" %>
+<% end -%>

@@ -1,0 +1,17 @@
+---
+# Default key/value pairs
+#pam_pkcs11::pkcs11_module:
+#    name: 'opensc'
+#    module: '/usr/lib/pkcs11/opensc.so'
+#pam_pkcs11::mappers:
+#    - 'ldap'
+#    - 'digest'
+#pam_pkcs11::mapper_options:
+#    ldap:
+#        debug: false
+#        URI:
+#            - 'ldap://example.com'
+#            - 'ldap://example.net'
+#        scope: 2
+#        binddn: 'cn=pam,dc=example,dc=com'
+#        passwd: 'super_secret_password'

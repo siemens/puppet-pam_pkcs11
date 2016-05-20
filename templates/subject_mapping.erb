@@ -1,0 +1,6 @@
+<% @subject_mappings.each do |k,v| -%>
+<%   if ! v.is_a?(String) then raise Puppet::Error.new("#{v} is not a string.") end -%>
+<% end -%>
+<% @subject_mappings.keys.sort.each do |uid| -%>
+<%=   "#{@subject_mappings[uid]} -> #{uid}" %>
+<% end -%>

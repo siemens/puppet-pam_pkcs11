@@ -1,0 +1,31 @@
+---
+inherit_from: .rubocop_todo.yml
+
+AllCops:
+  TargetRubyVersion: 1.9
+  Exclude:
+    # Ignore HTML related things
+    - '**/*.erb'
+    # Ignore vendored gems
+    - 'vendor/**/*'
+    # Ignore code from test fixtures
+    - 'spec/fixtures/**/*'
+
+Style/ClassAndModuleChildren:
+  EnforcedStyle: compact
+
+# Follow the Puppet Style Guide for trailing commas
+Style/TrailingCommaInLiteral:
+  EnforcedStyleForMultiline: comma
+
+# Except for argument lists where we need to maintain compatability with Ruby 1.8
+#Style/TrailingCommaInArguments:
+#  EnforcedStyleForMultiline: comma
+
+# Always prefer Puppet-style regex delimiters
+Style/RegexpLiteral:
+  AllowInnerSlashes: true
+
+# Use the line lenght specified in the Puppet Sytle Guide
+Metrics/LineLength:
+  Max: 140

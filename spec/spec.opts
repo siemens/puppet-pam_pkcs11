@@ -1,0 +1,4 @@
+--format d
+--color
+--loadby mtime
+--backtrace

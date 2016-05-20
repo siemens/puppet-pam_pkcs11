@@ -1,0 +1,26 @@
+########################################################################
+#             WARNING: This file is managed by Puppet.                 #
+#               Manual changes will be overwritten.                    #
+########################################################################
+pkcs11_eventmgr {
+  debug = <%= @debug -%>;
+  daemon = <%= @daemonize -%>;
+  polling_time = <%= @polling_time -%>;
+  expire_time = <%= @expire_time -%>;
+  pkcs11_module = "<%= @pkcs11_module_file -%>";
+
+  event card_insert {
+    on_error = "<%= @merged_event_opts['card_insert']['on_error'] -%>";
+    action = <%= "\"#{@merged_event_opts['card_insert']['action'].sort.join("\",\n             \"")}\"\;"%>
+  }
+
+  event card_remove {
+    on_error = "<%= @merged_event_opts['card_remove']['on_error'] -%>";
+    action = <%= "\"#{@merged_event_opts['card_remove']['action'].sort.join("\",\n             \"")}\"\;"%>
+  }
+
+  event expire_time {
+    on_error = "<%= @merged_event_opts['expire_time']['on_error'] -%>";
+    action = <%= "\"#{@merged_event_opts['expire_time']['action'].sort.join("\",\n             \"")}\"\;"%>
+  }
+}

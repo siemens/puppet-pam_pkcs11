@@ -1,0 +1,9 @@
+[Unit]
+Description=SmartCard PKCS#11 Event Manager
+Documentation=man:pkcs11_eventmgr(1)
+
+[Service]
+ExecStart=/usr/bin/pkcs11_eventmgr
+
+[Install]
+WantedBy=default.target

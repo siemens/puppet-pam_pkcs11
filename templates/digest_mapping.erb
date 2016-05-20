@@ -1,0 +1,9 @@
+<% @digest_mappings.each do |k,v| -%>
+<%   if ! v.is_a?(String) then raise Puppet::Error.new("#{v} is not a string.") end -%>
+<%   if v !~ /^[[:xdigit:]]{2}(:[[:xdigit:]]{2}){18}:[[:xdigit:]]{2}$/ -%>
+<%     raise Puppet::Error.new("#{v} does not match '^[[:xdigit:]]{2}(:[[:xdigit:]]{2}){18}:[[:xdigit:]]{2}$'") -%>
+<%   end -%>
+<% end -%>
+<% @digest_mappings.keys.sort.each do |uid| -%>
+<%=   "#{@digest_mappings[uid]} -> #{uid}" %>
+<% end -%>
