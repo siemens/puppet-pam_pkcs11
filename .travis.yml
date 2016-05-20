@@ -19,6 +19,10 @@ env:
   - CHECK=test STRICT_VARIABLES=yes PUPPET_GEM_VERSION='~> 4.0'
 matrix:
   exclude:
+    - rvm: 2.2
+      env: CHECK=test STRICT_VARIABLES=yes PUPPET_GEM_VERSION='~> 3.8.0'
+    - rvm: 2.2
+      env: CHECK=test STRICT_VARIABLES=yes PUPPET_GEM_VERSION='~> 3.8.0' FUTURE_PARSER=yes
     - rvm: 2.3
       env: CHECK=test STRICT_VARIABLES=yes PUPPET_GEM_VERSION='~> 3.8.0'
     - rvm: 2.3
