@@ -12,19 +12,11 @@ describe 'pam_pkcs11' do
     os_files_path = 'Debian'
   when 'RedHat', 'Suse'
     package_name = 'pam_pkcs11'
-    if fact('architecture') =~ /i[3-6]86/
-      if (fact('operatingsystem') =~ /RedHat|CentOS|Scientific|OracleLinux/) && (fact('operatingsystemmajrelease') == '5')
-        os_files_path = %w(RedHat 32 RedHat-5)
-      else
-        os_files_path = %w(RedHat 32)
-      end
-    else
-      if (fact('operatingsystem') =~ /RedHat|CentOS|Scientific|OracleLinux/) && (fact('operatingsystemmajrelease') == '5')
-        os_files_path = %w(RedHat 64 RedHat-5)
-      else
-        os_files_path = %w(RedHat 64)
-      end
-    end
+    os_files_path = if fact('architecture') =~ /i[3-6]86/
+                      fact('operatingsystemmajrelease') == 5 ? %w(RedHat 32 RedHat-5) : %w(RedHat 32)
+                    else
+                      fact('operatingsystemmajrelease') == 5 ? %w(RedHat 64 RedHat-5) : %w(RedHat 64)
+                    end
   end
 
   default_pam_pkcs11_conf = File.open(File.join(fixture_path, 'default_files', os_files_path, 'pam_pkcs11.conf')).read

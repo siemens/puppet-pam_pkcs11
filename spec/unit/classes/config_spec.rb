@@ -17,17 +17,9 @@ describe 'pam_pkcs11::config', :type => :class do
           'Debian'
         when 'RedHat', 'Suse'
           if facts[:architecture] =~ /i[3-6]86/
-            if (facts[:operatingsystem] =~ /RedHat|CentOS|Scientific|OracleLinux/) && (facts[:operatingsystemmajrelease] == '5')
-              %w(RedHat 32 RedHat-5)
-            else
-              %w(RedHat 32)
-            end
+            facts[:operatingsystemmajrelease] == '5' ? %w(RedHat 32 RedHat-5) : %w(RedHat 32)
           else
-            if (facts[:operatingsystem] =~ /RedHat|CentOS|Scientific|OracleLinux/) && (facts[:operatingsystemmajrelease] == '5')
-              %w(RedHat 64 RedHat-5)
-            else
-              %w(RedHat 64)
-            end
+            facts[:operatingsystemmajrelease] == '5' ? %w(RedHat 64 RedHat-5) : %w(RedHat 64)
           end
         end
       end
