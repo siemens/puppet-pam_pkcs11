@@ -2,9 +2,20 @@
 
 [![Build Status](https://travis-ci.org/lamawithonel/puppet-pam_pkcs11.svg?branch=master)](https://travis-ci.org/lamawithonel/puppet-pam_pkcs11)
 
+This is a Puppet module to manage *pam_pkcs11*, a PAM module developed as part
+of the [OpenSC project] for advanced authentication with smart cards and other
+PKCS #11 cryptographic modules.
+
+[OpenSC project]: https://github.com/OpenSC/OpenSC/wiki
+
+### END-OF-LIFE NOTICE
+
+_pam_pkcs11_ is unmaintained, as is this repository.  The repository is closed
+for bug reports and pull requests.  Please feel free to fork it in accordance
+with the licence terms.
+
 #### Table of Contents
 
-1. [Description](#description)
 1. [Setup - The basics of getting started with pam_pkcs11](#setup)
     * [What pam_pkcs11 affects](#what-pam_pkcs11-affects)
     * [Setup requirements](#setup-requirements)
@@ -13,14 +24,6 @@
 1. [Reference - An under-the-hood peek at what the module is doing and how](#reference)
 1. [Limitations - OS compatibility, etc.](#limitations)
 1. [Development - Guide for contributing to the module](#development)
-
-## Description
-
-This is a Puppet module to manage *pam_pkcs11*, a PAM module developed as part
-of the [OpenSC project] for advanced authentication with smart cards and other
-PKCS #11 cryptographic modules.
-
-[OpenSC project]: https://github.com/OpenSC/OpenSC/wiki
 
 ## Setup
 
