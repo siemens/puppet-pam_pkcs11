@@ -36,7 +36,7 @@ describe 'pam_pkcs11::pkcs11_eventmgr', type: :class do
 
       context 'without any parameters' do
         it { is_expected.to compile.with_all_deps }
-        it { is_expected.to contain_class('pam_pkcs11::pkcs11_eventmgr').that_requires('pam_pkcs11::install') }
+        it { is_expected.to contain_class('pam_pkcs11::pkcs11_eventmgr').that_requires('Class[pam_pkcs11::install]') }
 
         case facts[:osfamily]
         when 'Gentoo'

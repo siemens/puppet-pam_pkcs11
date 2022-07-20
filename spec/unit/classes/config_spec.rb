@@ -30,7 +30,7 @@ describe 'pam_pkcs11::config', type: :class do
 
       context 'without any parameters' do
         it { is_expected.to compile.with_all_deps }
-        it { is_expected.to contain_class('pam_pkcs11::config').that_requires('pam_pkcs11::install') }
+        it { is_expected.to contain_class('pam_pkcs11::config').that_requires('Class[pam_pkcs11::install]') }
 
         it do
           is_expected.to contain_file('/etc/pam_pkcs11').with(
