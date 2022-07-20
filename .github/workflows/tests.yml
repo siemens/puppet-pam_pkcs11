@@ -41,7 +41,6 @@ jobs:
       - name: Install ruby dependencies
         run: bundle install
       - name: Run static code checks
-        run: bundle exec rake validate lint rubocop
-          # disable for now: check
+        run: bundle exec rake validate lint check rubocop
       - name: Run parallel spec test
         run: bundle exec rake parallel_spec
