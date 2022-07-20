@@ -16,7 +16,7 @@ describe 'pam_pkcs11::pkcs11_eventmgr', type: :class do
       end
 
       let(:lib) do
-        if facts[:architecture].match?(%r{i[3-6]86})
+        if facts[:os].fetch('architecture', facts[:architecture]).match?(%r{i[3-6]86})
           'lib'
         else
           'lib64'
@@ -24,7 +24,7 @@ describe 'pam_pkcs11::pkcs11_eventmgr', type: :class do
       end
 
       let(:default_module_path) do
-        case facts[:osfamily]
+        case facts[:os]['family']
         when 'Gentoo'
           '/usr/lib/opensc-pkcs11.so'
         when 'Debian'
@@ -38,20 +38,20 @@ describe 'pam_pkcs11::pkcs11_eventmgr', type: :class do
         it { is_expected.to compile.with_all_deps }
         it { is_expected.to contain_class('pam_pkcs11::pkcs11_eventmgr').that_requires('Class[pam_pkcs11::install]') }
 
-        case facts[:osfamily]
+        case facts[:os]['family']
         when 'Gentoo'
           it_behaves_like('an OS that does not use systemd by default')
         when 'Debian'
-          case facts[:operatingsystem]
+          case facts[:os]['name']
           when 'Debian'
-            case facts[:operatingsystemmajrelease]
+            case facts[:os]['release']['major']
             when '8'
               it_behaves_like('an OS that uses systemd by default')
             else
               it_behaves_like('an OS that does not use systemd by default')
             end
           when 'Ubuntu'
-            case facts[:operatingsystemmajrelease]
+            case facts[:os]['release']['major']
             when '15.04', '15.10', '16.04'
               it_behaves_like('an OS that uses systemd by default')
             else
@@ -59,9 +59,9 @@ describe 'pam_pkcs11::pkcs11_eventmgr', type: :class do
             end
           end
         when 'RedHat'
-          case facts[:operatingsystem]
+          case facts[:os]['name']
           when 'RedHat', 'CentOS', 'Scientific', 'OracleLinux'
-            case facts[:operatingsystemmajrelease]
+            case facts[:os]['release']['major']
             when '7'
               it_behaves_like('an OS that uses systemd by default')
             else
@@ -71,7 +71,7 @@ describe 'pam_pkcs11::pkcs11_eventmgr', type: :class do
             it_behaves_like('an OS that uses systemd by default')
           end
         when 'Suse'
-          case facts[:operatingsystemmajrelease]
+          case facts[:os]['release']['major']
           when '12', '13', '42'
             it_behaves_like('an OS that uses systemd by default')
           else
@@ -175,13 +175,10 @@ describe 'pam_pkcs11::pkcs11_eventmgr', type: :class do
           }
         end
 
-        context 'to a vaid Number passed as a String' do
+        context 'to a valid Number passed as a String' do
           let(:params) { { 'polling_time' => '90' } }
 
-          it {
-            is_expected.to contain_file('pkcs11_eventmgr.conf')
-              .with_content(%r{  polling_time = 90;})
-          }
+          it { is_expected.to raise_error(Puppet::Error) }
         end
 
         context 'to an a non-numeric String' do
@@ -225,13 +222,10 @@ describe 'pam_pkcs11::pkcs11_eventmgr', type: :class do
           }
         end
 
-        context 'to a vaid Number passed as a String' do
+        context 'to a valid Number passed as a String' do
           let(:params) { { 'expire_time' => '90' } }
 
-          it {
-            is_expected.to contain_file('pkcs11_eventmgr.conf')
-              .with_content(%r{  expire_time = 90;})
-          }
+          it { is_expected.to raise_error(Puppet::Error) }
         end
 
         context 'to an a non-numeric String' do
@@ -490,7 +484,7 @@ describe 'pam_pkcs11::pkcs11_eventmgr', type: :class do
             { autostart_method: false }
           end
 
-          it { is_expected.to raise_error(Puppet::Error, %r{is not a string}) }
+          it { is_expected.to raise_error(Puppet::PreformattedError, %r{expects a String value}) }
         end
       end
     end

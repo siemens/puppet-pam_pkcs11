@@ -1,10 +1,9 @@
 # == Class pam_pkcs11::config
 #
-# This class is called from pam_pkcs11 for service config.
+# @summary This class is called from pam_pkcs11 for service config.
 #
 class pam_pkcs11::config inherits pam_pkcs11 {
-
-  require '::pam_pkcs11::install'
+  require 'pam_pkcs11::install'
 
   File {
     owner => 'root',
@@ -48,22 +47,21 @@ class pam_pkcs11::config inherits pam_pkcs11 {
   # FIXME: CAs hash links could-- maybe should-- be done with a custom type &
   #        provider.  Hash links are generic to OpenSSL, so it would make sense
   #        to do such a thing in an OpenSSL module.
-  if $::pam_pkcs11::ca_dir_source != [] and $::pam_pkcs11::merged_pkcs11_module['ca_dir'] != undef {
-
+  if $pam_pkcs11::ca_dir_source != [] and $pam_pkcs11::merged_pkcs11_module['ca_dir'] != undef {
     file { 'ca_dir':
       ensure       => directory,
       recurse      => true,
       recurselimit => 1,
-      path         => $::pam_pkcs11::merged_pkcs11_module['ca_dir'],
+      path         => $pam_pkcs11::merged_pkcs11_module['ca_dir'],
       mode         => '0644',
-      source       => $::pam_pkcs11::ca_dir_source,
-      sourceselect => $::pam_pkcs11::ca_dir_sourceselect,
+      source       => $pam_pkcs11::ca_dir_source,
+      sourceselect => $pam_pkcs11::ca_dir_sourceselect,
       notify       => Exec['pkcs11_make_hash_link'],
     }
 
     exec { 'pkcs11_make_hash_link':
       refreshonly => true,
-      cwd         => $::pam_pkcs11::merged_pkcs11_module['ca_dir'],
+      cwd         => $pam_pkcs11::merged_pkcs11_module['ca_dir'],
       path        => ['/usr/local/bin', '/usr/local/sbin', '/usr/bin', '/usr/sbin', '/bin', '/sbin'],
     }
   }

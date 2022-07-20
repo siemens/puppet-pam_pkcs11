@@ -8,7 +8,7 @@ describe 'pam_pkcs11::install', type: :class do
       end
 
       let(:package_name) do
-        case facts[:osfamily]
+        case facts[:os]['family']
         when 'Gentoo'
           'sys-auth/pam_pkcs11'
         when 'Debian'

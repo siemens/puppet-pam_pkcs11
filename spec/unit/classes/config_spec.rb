@@ -10,16 +10,16 @@ describe 'pam_pkcs11::config', type: :class do
       let(:fixture_path) { File.expand_path(File.join(__FILE__, '..', '..', '..', 'fixtures')) }
 
       let(:os_files_path) do
-        case facts[:osfamily]
+        case facts[:os]['family']
         when 'Gentoo'
           'Gentoo'
         when 'Debian'
           'Debian'
         when 'RedHat', 'Suse'
-          if facts[:architecture].match?(%r{i[3-6]86})
-            facts[:operatingsystemmajrelease] == '5' ? ['RedHat', '32', 'RedHat-5'] : ['RedHat', '32']
+          if facts[:os].fetch('architecture', facts[:architecture]).match?(%r{i[3-6]86})
+            facts[:os]['release']['major'] == '5' ? ['RedHat', '32', 'RedHat-5'] : ['RedHat', '32']
           else
-            facts[:operatingsystemmajrelease] == '5' ? ['RedHat', '64', 'RedHat-5'] : ['RedHat', '64']
+            facts[:os]['release']['major'] == '5' ? ['RedHat', '64', 'RedHat-5'] : ['RedHat', '64']
           end
         end
       end

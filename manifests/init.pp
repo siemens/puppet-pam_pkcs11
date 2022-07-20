@@ -1,44 +1,44 @@
 # Class: pam_pkcs11
 # ===========================
 #
-# Manages the pam_pkcs11 Linux-PAM module and associated tools.
+# @summary Manages the pam_pkcs11 Linux-PAM module and associated tools.
 #
 # Parameters
 # ----------
 #
-# * `package_name`
+# @param package_name
 #   String
 #
 #   The name of the package to install.
 #
 #   Default: (platform dependent)
 #
-# * `debug`
+# @param debug
 #   Boolean
 #
 #   Whether or not to enable debugging for the `pam_pkcs11` PAM module.
 #
 #   Default: false
 #
-# * `nullok`
+# @param nullok
 #   Boolean
 #
-# * `use_first_pass`
+# @param use_first_pass
 #   Boolean
 #
-# * `try_first_pass`
+# @param try_first_pass
 #   Boolean
 #
-# * `use_authtok`
+# @param use_authtok
 #   Boolean
 #
-# * `card_only`
+# @param card_only
 #   Boolean
 #
-# * `wait_for_card`
+# @param wait_for_card
 #   Boolean
 #
-# * `pkcs11_module`
+# @param pkcs11_module
 #   Hash
 #
 #   A hash containing configuration for the selected PKCS #11 module.  The
@@ -48,14 +48,14 @@
 #
 #   Default: (see params.pp)
 #
-# * `use_mappers`
+# @param use_mappers
 #   Array
 #
 #   An array of mappers to use.
 #
 #   Default: ['digest']
 #
-# * `mapper_option`
+# @param mapper_options
 #   Hash
 #
 #   A nested hash with options for each mapper in use.  The first-level key name
@@ -65,7 +65,7 @@
 #
 #   Default: (see params.pp)
 #
-# * `digest_mappings`
+# @param digest_mappings
 #   Hash
 #
 #   A hash of user/fingerprint pairs for use with the `digest` mapper.  Each key
@@ -74,7 +74,17 @@
 #
 #   Default: {}
 #
-# * `ca_dir_source`
+# @param subject_mappings
+#   Hash
+#
+#   Default: {}
+#
+# @param uid_mappings
+#   Hash
+#
+#   Default: {}
+#
+# @param ca_dir_source
 #   Array
 #
 #   An array of source URIs for the CA directory.  URIs must be `puppet://` URIs
@@ -117,7 +127,12 @@
 #
 #   Default: []
 #
-# * `manage_pkcs11_eventmgr`
+# @param ca_dir_sourceselect
+#   String
+#
+#   Default: 'first'
+#
+# @param manage_pkcs11_eventmgr
 #   Boolean
 #
 #   Whether or not to manage the `pkcs11_eventmgr(1)`.
@@ -125,45 +140,29 @@
 #   Default: true
 #
 class pam_pkcs11 (
-  $package_name           = $::pam_pkcs11::params::package_name,
-  $debug                  = false,
-  $nullok                 = false,
-  $use_first_pass         = false,
-  $try_first_pass         = false,
-  $use_authtok            = false,
-  $card_only              = false,
-  $wait_for_card          = false,
-  $pkcs11_module          = {},
-  $use_mappers            = ['digest'],
-  $mapper_options         = {},
-  $digest_mappings        = {},
-  $subject_mappings       = {},
-  $uid_mappings           = {},
-  $ca_dir_source          = [],
-  $ca_dir_sourceselect    = 'first',
-  $manage_pkcs11_eventmgr = true,
-) inherits ::pam_pkcs11::params {
-
-  validate_string($package_name)
-  validate_bool($debug)
-  validate_bool($nullok)
-  validate_bool($use_first_pass)
-  validate_bool($try_first_pass)
-  validate_bool($use_authtok)
-  validate_bool($card_only)
-  validate_bool($wait_for_card)
-  validate_hash($pkcs11_module)
-  validate_array($use_mappers)
-  validate_hash($mapper_options)
-  validate_hash($digest_mappings)
-  validate_hash($subject_mappings)
-  validate_hash($uid_mappings)
-  validate_array($ca_dir_source)
-  if $ca_dir_source != [] and $::osfamily == 'RedHat' { fail('The `ca_dir_source` parameter is not supported on RedHat OS families.') }
+  String        $package_name           = $pam_pkcs11::params::package_name,
+  Boolean       $debug                  = false,
+  Boolean       $nullok                 = false,
+  Boolean       $use_first_pass         = false,
+  Boolean       $try_first_pass         = false,
+  Boolean       $use_authtok            = false,
+  Boolean       $card_only              = false,
+  Boolean       $wait_for_card          = false,
+  Hash          $pkcs11_module          = {},
+  Array[String] $use_mappers            = ['digest'],
+  Hash          $mapper_options         = {},
+  Hash          $digest_mappings        = {},
+  Hash          $subject_mappings       = {},
+  Hash          $uid_mappings           = {},
+  Array[String] $ca_dir_source          = [],
+  String        $ca_dir_sourceselect    = 'first',
+  Boolean       $manage_pkcs11_eventmgr = true,
+) inherits pam_pkcs11::params {
+  if $ca_dir_source != [] and $facts['os']['family'] == 'RedHat' { fail('The `ca_dir_source` parameter is not supported on RedHat OS families.') }
   validate_re($ca_dir_sourceselect, '^(?:first|all)$')
   validate_bool($manage_pkcs11_eventmgr)
 
-  $merged_pkcs11_module  = merge($::pam_pkcs11::params::pkcs11_module, $pkcs11_module)
+  $merged_pkcs11_module  = merge($pam_pkcs11::params::pkcs11_module, $pkcs11_module)
 
   # PKCS#11 Module option validation
   validate_string($merged_pkcs11_module['name'])
@@ -177,7 +176,7 @@ class pam_pkcs11 (
   validate_string($merged_pkcs11_module['cert_policy'])
   validate_string($merged_pkcs11_module['token_type'])
 
-  $merged_mapper_options = deep_merge($::pam_pkcs11::params::mapper_options, $mapper_options)
+  $merged_mapper_options = deep_merge($pam_pkcs11::params::mapper_options, $mapper_options)
 
   # Mapper option validation (Oh, woe is me.)
   validate_bool($merged_mapper_options['digest']['debug'])
@@ -253,7 +252,7 @@ class pam_pkcs11 (
   #   validate_re($fingerprint, '^[[:xdigit:]]{2}(:[[:xdigit:]]{2}){18}:[[:xdigit:]]{2}$')
   # }
 
-  include '::pam_pkcs11::install'
-  include '::pam_pkcs11::config'
-  if $manage_pkcs11_eventmgr == true { include '::pam_pkcs11::pkcs11_eventmgr' }
+  include 'pam_pkcs11::install'
+  include 'pam_pkcs11::config'
+  if $manage_pkcs11_eventmgr == true { include 'pam_pkcs11::pkcs11_eventmgr' }
 }

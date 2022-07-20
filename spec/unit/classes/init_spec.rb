@@ -8,7 +8,7 @@ describe 'pam_pkcs11', type: :class do
       end
 
       let(:package_name) do
-        case facts[:osfamily]
+        case facts[:os]['family']
         when 'Gentoo'
           'sys-auth/pam_pkcs11'
         when 'Debian'
@@ -21,16 +21,16 @@ describe 'pam_pkcs11', type: :class do
       let(:fixture_path) { File.expand_path(File.join(__FILE__, '..', '..', '..', 'fixtures')) }
 
       let(:os_files_path) do
-        case facts[:osfamily]
+        case facts[:os]['family']
         when 'Gentoo'
           'Gentoo'
         when 'Debian'
           'Debian'
         when 'RedHat', 'Suse'
-          if facts[:architecture].match?(%r{i[3-6]86})
-            facts[:operatingsystemmajrelease] == '5' ? ['RedHat', '32', 'RedHat-5'] : ['RedHat', '32']
+          if facts[:os].fetch('architecture', facts[:architecture]).match?(%r{i[3-6]86})
+            facts[:os]['release']['major'] == '5' ? ['RedHat', '32', 'RedHat-5'] : ['RedHat', '32']
           else
-            facts[:operatingsystemmajrelease] == '5' ? ['RedHat', '64', 'RedHat-5'] : ['RedHat', '64']
+            facts[:os]['release']['major'] == '5' ? ['RedHat', '64', 'RedHat-5'] : ['RedHat', '64']
           end
         end
       end
@@ -437,9 +437,9 @@ describe 'pam_pkcs11', type: :class do
             }
           end
 
-          if facts[:osfamily] == 'Debian'
+          if facts[:os]['family'] == 'Debian'
             it_behaves_like 'a host with an OpenSSL CA hash link directory', 'first'
-          elsif facts[:osfamily] == 'RedHat'
+          elsif facts[:os]['family'] == 'RedHat'
             it { is_expected.to raise_error(Puppet::Error) }
           else
             it { is_expected.not_to contain_file('ca_dir') }
@@ -479,7 +479,7 @@ describe 'pam_pkcs11', type: :class do
             }
           end
 
-          if facts[:osfamily] == 'RedHat'
+          if facts[:os]['family'] == 'RedHat'
             it { is_expected.to raise_error(Puppet::Error) }
           else
             it_behaves_like 'a host with an OpenSSL CA hash link directory', 'all'
@@ -498,7 +498,7 @@ describe 'pam_pkcs11', type: :class do
             }
           end
 
-          if facts[:osfamily] == 'RedHat'
+          if facts[:os]['family'] == 'RedHat'
             it { is_expected.to raise_error(Puppet::Error) }
           else
             it_behaves_like 'a host with an OpenSSL CA hash link directory', 'first'
@@ -514,7 +514,7 @@ describe 'pam_pkcs11', type: :class do
         context 'to a non-String' do
           let(:params) { { 'ca_dir_sourceselect' => true } }
 
-          it { is_expected.to raise_error(Puppet::Error, %r{does not match}) }
+          it { is_expected.to raise_error(Puppet::PreformattedError, %r{expects a String value}) }
         end
       end
 
@@ -545,8 +545,14 @@ describe 'pam_pkcs11', type: :class do
   context 'on an unsupported operating system' do
     let(:facts) do
       {
-        osfamily: 'JUNOS',
-        operatingsystem: 'JUNOS',
+        'os' => {
+          'name'   => 'JUNOS',
+          'family' => 'JUNOS',
+        },
+        :os => {
+          'name'   => 'JUNOS',
+          'family' => 'JUNOS',
+        },
       }
     end
 

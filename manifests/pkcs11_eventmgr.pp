@@ -1,39 +1,67 @@
 # == Class pam_pkcs11::pkcs11_eventmgr
 #
-# This class is called from pam_pkcs11 to configure `pkcs11_eventmgr(1)`.
+# @summary This class is called from pam_pkcs11 to configure `pkcs11_eventmgr(1)`.
+#
+# @param debug
+#   Boolean
+#
+#   Default: false
+#
+# @param daemonize
+#   Boolean
+#
+#   Default: true
+#
+# @param polling_time
+#   Integer
+#
+#   Default: 1
+#
+# @param expire_time
+#   Integer
+#
+#   Default: 0
+#
+# @param pkcs11_module
+#   String
+#
+#   Default: 'default'
+#
+# @param event_opts
+#   Hash
+#
+#   Default: {}
+#
+# @param autostart_method
+#   String
+#
+#   Default: $pam_pkcs11::params::pkcs11_eventmgr_autostart_method,
 #
 class pam_pkcs11::pkcs11_eventmgr (
-  $debug            = false,
-  $daemonize        = true,
-  $polling_time     = 1,
-  $expire_time      = 0,
-  $pkcs11_module    = 'default',
-  $event_opts       = {},
-  $autostart_method = $::pam_pkcs11::params::pkcs11_eventmgr_autostart_method,
+  Boolean    $debug            = false,
+  Boolean    $daemonize        = true,
+  Integer[0] $polling_time     = 1,
+  Integer[0] $expire_time      = 0,
+  String     $pkcs11_module    = 'default',
+  Hash       $event_opts       = {},
+  String     $autostart_method = $pam_pkcs11::params::pkcs11_eventmgr_autostart_method,
 ) inherits pam_pkcs11::params {
-
-  require '::pam_pkcs11::install'
-  include '::pam_pkcs11'
+  require 'pam_pkcs11::install'
+  include 'pam_pkcs11'
 
   if $pkcs11_module == 'default' {
-    $pkcs11_module_file = $::pam_pkcs11::merged_pkcs11_module['module']
+    $pkcs11_module_file = $pam_pkcs11::merged_pkcs11_module['module']
   } else {
     validate_absolute_path($pkcs11_module)
-    if is_array($pkcs11_module) { fail('The paremeter `pkcs11_module` must be a String.  It is an Array.') }
+    if is_array($pkcs11_module) {
+      fail('The paremeter `pkcs11_module` must be a String.  It is an Array.')
+    }
     $pkcs11_module_file = $pkcs11_module
   }
 
-  validate_bool($debug)
-  validate_bool($daemonize)
-  validate_integer($polling_time, undef, 0)
-  if is_array($polling_time) { fail('The paremeter `polling_time` must be an Integer.  It is an Array.') }
-  validate_integer($expire_time, undef, 0)
-  if is_array($expire_time) { fail('The paremeter `expire_time` must be an Integer.  It is an Array.') }
-  validate_string($autostart_method)
   validate_re($autostart_method, '^(?:systemd_service|xdg_autostart|none)$')
-  validate_hash($event_opts)
 
-  $merged_event_opts = merge($::pam_pkcs11::params::pkcs11_event_opts, $event_opts)
+  $merged_event_opts = merge($pam_pkcs11::params::pkcs11_event_opts, $event_opts)
 
   validate_re($merged_event_opts['card_insert']['on_error'], '^(?:ignore|return|quit)$')
   validate_re($merged_event_opts['card_remove']['on_error'], '^(?:ignore|return|quit)$')

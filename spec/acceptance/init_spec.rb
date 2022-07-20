@@ -3,7 +3,7 @@ require 'spec_helper_acceptance'
 describe 'pam_pkcs11' do
   fixture_path = File.expand_path(File.join(__FILE__, '..', '..', 'fixtures'))
 
-  case fact('osfamily')
+  case fact('os')['family']
   when 'Gentoo'
     package_name = 'sys-auth/pam_pkcs11'
     os_files_path = 'Gentoo'
@@ -12,10 +12,10 @@ describe 'pam_pkcs11' do
     os_files_path = 'Debian'
   when 'RedHat', 'Suse'
     package_name = 'pam_pkcs11'
-    os_files_path = if fact('architecture').match?(%r{i[3-6]86})
-                      fact('operatingsystemmajrelease') == 5 ? ['RedHat', '32', 'RedHat-5'] : ['RedHat', '32']
+    os_files_path = if fact('os')['architecture'].match?(%r{i[3-6]86})
+                      fact('os')['release']['major'] == 5 ? ['RedHat', '32', 'RedHat-5'] : ['RedHat', '32']
                     else
-                      fact('operatingsystemmajrelease') == 5 ? ['RedHat', '64', 'RedHat-5'] : ['RedHat', '64']
+                      fact('os')['release']['major'] == 5 ? ['RedHat', '64', 'RedHat-5'] : ['RedHat', '64']
                     end
   end
 
@@ -68,7 +68,7 @@ describe 'pam_pkcs11' do
       }
       END
 
-      if fact('osfamily') == 'RedHat'
+      if fact('os')['family'] == 'RedHat'
         it 'must fail without making any changes' do
           apply_manifest(manifest, expect_failures: true, acceptable_exit_codes: [4])
         end
