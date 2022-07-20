@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'pam_pkcs11', :type => :class do
+describe 'pam_pkcs11', type: :class do
   on_supported_os.each do |os, facts|
     context "on #{os}" do
       let(:facts) do
@@ -27,10 +27,10 @@ describe 'pam_pkcs11', :type => :class do
         when 'Debian'
           'Debian'
         when 'RedHat', 'Suse'
-          if facts[:architecture] =~ /i[3-6]86/
-            facts[:operatingsystemmajrelease] == '5' ? %w(RedHat 32 RedHat-5) : %w(RedHat 32)
+          if facts[:architecture].match?(%r{i[3-6]86})
+            facts[:operatingsystemmajrelease] == '5' ? ['RedHat', '32', 'RedHat-5'] : ['RedHat', '32']
           else
-            facts[:operatingsystemmajrelease] == '5' ? %w(RedHat 64 RedHat-5) : %w(RedHat 64)
+            facts[:operatingsystemmajrelease] == '5' ? ['RedHat', '64', 'RedHat-5'] : ['RedHat', '64']
           end
         end
       end
@@ -67,19 +67,21 @@ describe 'pam_pkcs11', :type => :class do
             'ensure' => 'directory',
             'owner'  => 'root',
             'group'  => 'root',
-            'mode'   => '0755'
+            'mode'   => '0755',
           )
         end
 
         it do
-          is_expected.to contain_file('pam_pkcs11.conf').with(
-            'ensure' => 'file',
-            'owner'  => 'root',
-            'group'  => 'root',
-            'mode'   => '0600',
-            'path'   => '/etc/pam_pkcs11/pam_pkcs11.conf'
-          ).with_content(default_pam_pkcs11_conf).
-            that_requires('File[/etc/pam_pkcs11]')
+          is_expected.to contain_file('pam_pkcs11.conf')
+            .with(
+              'ensure' => 'file',
+              'owner'  => 'root',
+              'group'  => 'root',
+              'mode'   => '0600',
+              'path'   => '/etc/pam_pkcs11/pam_pkcs11.conf',
+            )
+            .with_content(default_pam_pkcs11_conf)
+            .that_requires('File[/etc/pam_pkcs11]')
         end
 
         #
@@ -92,7 +94,7 @@ describe 'pam_pkcs11', :type => :class do
             'owner'   => 'root',
             'group'   => 'root',
             'mode'    => '0644',
-            'content' => default_pkcs11_eventmgr_conf
+            'content' => default_pkcs11_eventmgr_conf,
           )
         end
       end # 'without any parameters'
@@ -102,14 +104,20 @@ describe 'pam_pkcs11', :type => :class do
           let(:params) { { 'debug' => true } }
 
           # FIXME: `debug` appears multiple times in the file
-          it { is_expected.to contain_file('pam_pkcs11.conf').with_content(/  debug             = true;/) }
+          it {
+            is_expected.to contain_file('pam_pkcs11.conf')
+              .with_content(%r{  debug             = true;})
+          }
         end
 
         context 'to `false`' do
           let(:params) { { 'debug' => false } }
 
           # FIXME: `debug` appears multiple times in the file
-          it { is_expected.to contain_file('pam_pkcs11.conf').with_content(/  debug             = false;/) }
+          it {
+            is_expected.to contain_file('pam_pkcs11.conf')
+              .with_content(%r{  debug             = false;})
+          }
         end
       end
 
@@ -117,13 +125,19 @@ describe 'pam_pkcs11', :type => :class do
         context 'to `true`' do
           let(:params) { { 'nullok' => true } }
 
-          it { is_expected.to contain_file('pam_pkcs11.conf').with_content(/  nullok            = true;/) }
+          it {
+            is_expected.to contain_file('pam_pkcs11.conf')
+              .with_content(%r{  nullok            = true;})
+          }
         end
 
         context 'to `false`' do
           let(:params) { { 'debug' => false } }
 
-          it { is_expected.to contain_file('pam_pkcs11.conf').with_content(/  nullok            = false;/) }
+          it {
+            is_expected.to contain_file('pam_pkcs11.conf')
+              .with_content(%r{  nullok            = false;})
+          }
         end
       end
 
@@ -131,13 +145,19 @@ describe 'pam_pkcs11', :type => :class do
         context 'to `true`' do
           let(:params) { { 'use_first_pass' => true } }
 
-          it { is_expected.to contain_file('pam_pkcs11.conf').with_content(/  use_first_pass    = true;/) }
+          it {
+            is_expected.to contain_file('pam_pkcs11.conf')
+              .with_content(%r{  use_first_pass    = true;})
+          }
         end
 
         context 'to `false`' do
           let(:params) { { 'debug' => false } }
 
-          it { is_expected.to contain_file('pam_pkcs11.conf').with_content(/  use_first_pass    = false;/) }
+          it {
+            is_expected.to contain_file('pam_pkcs11.conf')
+              .with_content(%r{  use_first_pass    = false;})
+          }
         end
       end
 
@@ -145,13 +165,19 @@ describe 'pam_pkcs11', :type => :class do
         context 'to `true`' do
           let(:params) { { 'try_first_pass' => true } }
 
-          it { is_expected.to contain_file('pam_pkcs11.conf').with_content(/  try_first_pass    = true;/) }
+          it {
+            is_expected.to contain_file('pam_pkcs11.conf')
+              .with_content(%r{  try_first_pass    = true;})
+          }
         end
 
         context 'to `false`' do
           let(:params) { { 'debug' => false } }
 
-          it { is_expected.to contain_file('pam_pkcs11.conf').with_content(/  try_first_pass    = false;/) }
+          it {
+            is_expected.to contain_file('pam_pkcs11.conf')
+              .with_content(%r{  try_first_pass    = false;})
+          }
         end
       end
 
@@ -159,13 +185,19 @@ describe 'pam_pkcs11', :type => :class do
         context 'to `true`' do
           let(:params) { { 'use_authtok' => true } }
 
-          it { is_expected.to contain_file('pam_pkcs11.conf').with_content(/  use_authtok       = true;/) }
+          it {
+            is_expected.to contain_file('pam_pkcs11.conf')
+              .with_content(%r{  use_authtok       = true;})
+          }
         end
 
         context 'to `false`' do
           let(:params) { { 'debug' => false } }
 
-          it { is_expected.to contain_file('pam_pkcs11.conf').with_content(/  use_authtok       = false;/) }
+          it {
+            is_expected.to contain_file('pam_pkcs11.conf')
+              .with_content(%r{  use_authtok       = false;})
+          }
         end
       end
 
@@ -173,13 +205,19 @@ describe 'pam_pkcs11', :type => :class do
         context 'to `true`' do
           let(:params) { { 'card_only' => true } }
 
-          it { is_expected.to contain_file('pam_pkcs11.conf').with_content(/  card_only         = true;/) }
+          it {
+            is_expected.to contain_file('pam_pkcs11.conf')
+              .with_content(%r{  card_only         = true;})
+          }
         end
 
         context 'to `false`' do
           let(:params) { { 'debug' => false } }
 
-          it { is_expected.to contain_file('pam_pkcs11.conf').with_content(/  card_only         = false;/) }
+          it {
+            is_expected.to contain_file('pam_pkcs11.conf')
+              .with_content(%r{  card_only         = false;})
+          }
         end
       end
 
@@ -187,26 +225,39 @@ describe 'pam_pkcs11', :type => :class do
         context 'to `true`' do
           let(:params) { { 'wait_for_card' => true } }
 
-          it { is_expected.to contain_file('pam_pkcs11.conf').with_content(/  wait_for_card     = true;/) }
+          it {
+            is_expected.to contain_file('pam_pkcs11.conf')
+              .with_content(%r{  wait_for_card     = true;})
+          }
         end
 
         context 'to `false`' do
           let(:params) { { 'debug' => false } }
 
-          it { is_expected.to contain_file('pam_pkcs11.conf').with_content(/  wait_for_card     = false;/) }
+          it {
+            is_expected.to contain_file('pam_pkcs11.conf')
+              .with_content(%r{  wait_for_card     = false;})
+          }
         end
       end
 
       context 'when `use_mappers` is set' do
         context 'to a single, supported value' do
           let(:params) { { 'use_mappers' => ['digest'] } }
-          it { is_expected.to contain_file('pam_pkcs11.conf').with_content(/use_mappers = "digest";/) }
+
+          it {
+            is_expected.to contain_file('pam_pkcs11.conf')
+              .with_content(%r{use_mappers = "digest";})
+          }
         end
 
         context 'to a multiple, supported values' do
-          let(:params) { { 'use_mappers' => %w(ldap digest) } }
+          let(:params) { { 'use_mappers' => ['ldap', 'digest'] } }
 
-          it { is_expected.to contain_file('pam_pkcs11.conf').with_content(/use_mappers = "ldap, digest";/) }
+          it {
+            is_expected.to contain_file('pam_pkcs11.conf')
+              .with_content(%r{use_mappers = "ldap, digest";})
+          }
         end
 
         context 'to an unsupported value' do
@@ -225,7 +276,7 @@ describe 'pam_pkcs11', :type => :class do
       context 'when `digest_mappings` contains multiple good mappings' do
         let(:params) do
           {
-            :digest_mappings => {
+            digest_mappings: {
               'alice' => '79:E7:27:38:59:24:C6:AD:92:E5:AA:FA:20:0F:D6:9A:D5:47:87:DF',
               'bob'   => 'DD:75:AD:96:0E:CD:BD:25:E7:27:02:8B:34:3D:E4:08:FA:44:A8:31',
             },
@@ -233,60 +284,60 @@ describe 'pam_pkcs11', :type => :class do
         end
 
         it do
-          is_expected.to contain_file('digest_mapping').
-            with_ensure('file').
-            with_path('/etc/pam_pkcs11/digest_mapping').
-            with_owner('root').
-            with_group('root').
-            with_mode('0600').
-            with_content(/^79:E7:27:38:59:24:C6:AD:92:E5:AA:FA:20:0F:D6:9A:D5:47:87:DF -> alice$/).
-            with_content(/^DD:75:AD:96:0E:CD:BD:25:E7:27:02:8B:34:3D:E4:08:FA:44:A8:31 -> bob$/)
+          is_expected.to contain_file('digest_mapping')
+            .with_ensure('file')
+            .with_path('/etc/pam_pkcs11/digest_mapping')
+            .with_owner('root')
+            .with_group('root')
+            .with_mode('0600')
+            .with_content(%r{^79:E7:27:38:59:24:C6:AD:92:E5:AA:FA:20:0F:D6:9A:D5:47:87:DF -> alice$})
+            .with_content(%r{^DD:75:AD:96:0E:CD:BD:25:E7:27:02:8B:34:3D:E4:08:FA:44:A8:31 -> bob$})
         end
       end
 
       context 'when a fingerprint in in `digest_mappings` is specified as an invalid type' do
         let(:params) do
           {
-            :digest_mappings => {
+            digest_mappings: {
               'alice' => ['79:E7:27:38:59:24:C6:AD:92:E5', 'AA:FA:20:0F:D6:9A:D5:47:87:DF'],
               'bob'   => 'DD:75:AD:96:0E:CD:BD:25:E7:27:02:8B:34:3D:E4:08:FA:44:A8:31',
             },
           }
         end
 
-        it { is_expected.to raise_error(Puppet::Error, /is not a string/) }
+        it { is_expected.to raise_error(Puppet::Error, %r{is not a string}) }
       end
 
       context 'when the first fingerprint in `digest_mappings` is invalid' do
         let(:params) do
           {
-            :digest_mappings => {
+            digest_mappings: {
               'alice' => 'not_a_fingerprint',
               'bob'   => 'DD:75:AD:96:0E:CD:BD:25:E7:27:02:8B:34:3D:E4:08:FA:44:A8:31',
             },
           }
         end
 
-        it { is_expected.to raise_error(Puppet::Error, /does not match/) }
+        it { is_expected.to raise_error(Puppet::Error, %r{does not match}) }
       end
 
       context 'when the second fingerprint in `digest_mappings` is invalid' do
         let(:params) do
           {
-            :digest_mappings => {
+            digest_mappings: {
               'alice' => '79:E7:27:38:59:24:C6:AD:92:E5:AA:FA:20:0F:D6:9A:D5:47:87:DF',
               'bob'   => 'not_a_fingerprint',
             },
           }
         end
 
-        it { is_expected.to raise_error(Puppet::Error, /does not match/) }
+        it { is_expected.to raise_error(Puppet::Error, %r{does not match}) }
       end
 
       context 'when `subject_mappings` contains multiple good mappings' do
         let(:params) do
           {
-            :subject_mappings => {
+            subject_mappings: {
               'alice' => '/C=US/O=Example/OU=People/UID=alice/CN=Alice',
               'bob'   => '/C=US/O=Example/OU=People/UID=bob/CN=Bob',
             },
@@ -294,34 +345,34 @@ describe 'pam_pkcs11', :type => :class do
         end
 
         it do
-          is_expected.to contain_file('subject_mapping').
-            with_ensure('file').
-            with_path('/etc/pam_pkcs11/subject_mapping').
-            with_owner('root').
-            with_group('root').
-            with_mode('0600').
-            with_content(/^\/C=US\/O=Example\/OU=People\/UID=alice\/CN=Alice -> alice$/).
-            with_content(/^\/C=US\/O=Example\/OU=People\/UID=bob\/CN=Bob -> bob$/)
+          is_expected.to contain_file('subject_mapping')
+            .with_ensure('file')
+            .with_path('/etc/pam_pkcs11/subject_mapping')
+            .with_owner('root')
+            .with_group('root')
+            .with_mode('0600')
+            .with_content(%r{^/C=US/O=Example/OU=People/UID=alice/CN=Alice -> alice$})
+            .with_content(%r{^/C=US/O=Example/OU=People/UID=bob/CN=Bob -> bob$})
         end
       end
 
       context 'when a subject in in `subject_mappings` is specified as an invalid type' do
         let(:params) do
           {
-            :subject_mappings => {
+            subject_mappings: {
               'alice' => { 'C' => 'US', 'O' => 'Example', 'OU' => 'People', 'UID' => 'alice', 'CN' => 'Alice' },
               'bob'   => '/C=US/O=Example/OU=People/UID=bob/CN=Bob',
             },
           }
         end
 
-        it { is_expected.to raise_error(Puppet::Error, /is not a string/) }
+        it { is_expected.to raise_error(Puppet::Error, %r{is not a string}) }
       end
 
       context 'when `uid_mappings` contains multiple good mappings' do
         let(:params) do
           {
-            :uid_mappings => {
+            uid_mappings: {
               'alice' => 'alicia',
               'bob'   => 'robert',
             },
@@ -329,28 +380,28 @@ describe 'pam_pkcs11', :type => :class do
         end
 
         it do
-          is_expected.to contain_file('uid_mapping').
-            with_ensure('file').
-            with_path('/etc/pam_pkcs11/uid_mapping').
-            with_owner('root').
-            with_group('root').
-            with_mode('0600').
-            with_content(/^alicia -> alice$/).
-            with_content(/^robert -> bob$/)
+          is_expected.to contain_file('uid_mapping')
+            .with_ensure('file')
+            .with_path('/etc/pam_pkcs11/uid_mapping')
+            .with_owner('root')
+            .with_group('root')
+            .with_mode('0600')
+            .with_content(%r{^alicia -> alice$})
+            .with_content(%r{^robert -> bob$})
         end
       end
 
       context 'when a uid in in `uid_mappings` is specified as an invalid type' do
         let(:params) do
           {
-            :uid_mappings => {
+            uid_mappings: {
               'alice' => ['alicia'],
               'bob' => 'robert',
             },
           }
         end
 
-        it { is_expected.to raise_error(Puppet::Error, /is not a string/) }
+        it { is_expected.to raise_error(Puppet::Error, %r{is not a string}) }
       end
 
       shared_examples_for 'a host with an OpenSSL CA hash link directory' do |sourceselect|
@@ -362,7 +413,7 @@ describe 'pam_pkcs11', :type => :class do
             'mode'         => '0644',
             'path'         => '/etc/pam_pkcs11/cacerts',
             'source'       => ['puppet:///modules/files/pam_pkcs11/ca_dir', 'puppet:///modules/ca_certs/certs'],
-            'sourceselect' => sourceselect
+            'sourceselect' => sourceselect,
           ).that_notifies('Exec[pkcs11_make_hash_link]')
         end
 
@@ -370,7 +421,7 @@ describe 'pam_pkcs11', :type => :class do
           is_expected.to contain_exec('pkcs11_make_hash_link').with(
             'refreshonly' => true,
             'cwd'         => '/etc/pam_pkcs11/cacerts',
-            'path'        => ['/usr/local/bin', '/usr/local/sbin', '/usr/bin', '/usr/sbin', '/bin', '/sbin']
+            'path'        => ['/usr/local/bin', '/usr/local/sbin', '/usr/bin', '/usr/sbin', '/bin', '/sbin'],
           )
         end
       end
@@ -387,7 +438,7 @@ describe 'pam_pkcs11', :type => :class do
           end
 
           if facts[:osfamily] == 'Debian'
-            it_should_behave_like 'a host with an OpenSSL CA hash link directory', 'first'
+            it_behaves_like 'a host with an OpenSSL CA hash link directory', 'first'
           elsif facts[:osfamily] == 'RedHat'
             it { is_expected.to raise_error(Puppet::Error) }
           else
@@ -431,7 +482,7 @@ describe 'pam_pkcs11', :type => :class do
           if facts[:osfamily] == 'RedHat'
             it { is_expected.to raise_error(Puppet::Error) }
           else
-            it_should_behave_like 'a host with an OpenSSL CA hash link directory', 'all'
+            it_behaves_like 'a host with an OpenSSL CA hash link directory', 'all'
           end
         end
 
@@ -450,20 +501,20 @@ describe 'pam_pkcs11', :type => :class do
           if facts[:osfamily] == 'RedHat'
             it { is_expected.to raise_error(Puppet::Error) }
           else
-            it_should_behave_like 'a host with an OpenSSL CA hash link directory', 'first'
+            it_behaves_like 'a host with an OpenSSL CA hash link directory', 'first'
           end
         end
 
         context 'to an invalid value' do
           let(:params) { { 'ca_dir_sourceselect' => 'none' } }
 
-          it { is_expected.to raise_error(Puppet::Error, /does not match/) }
+          it { is_expected.to raise_error(Puppet::Error, %r{does not match}) }
         end
 
         context 'to a non-String' do
           let(:params) { { 'ca_dir_sourceselect' => true } }
 
-          it { is_expected.to raise_error(Puppet::Error, /does not match/) }
+          it { is_expected.to raise_error(Puppet::Error, %r{does not match}) }
         end
       end
 
@@ -494,14 +545,13 @@ describe 'pam_pkcs11', :type => :class do
   context 'on an unsupported operating system' do
     let(:facts) do
       {
-        :osfamily        => 'JUNOS',
-        :operatingsystem => 'JUNOS',
+        osfamily: 'JUNOS',
+        operatingsystem: 'JUNOS',
       }
     end
 
     context 'without any parameters' do
-      it { is_expected.to raise_error(Puppet::Error, /#{facts[:operatingsystem]} not supported/) }
+      it { is_expected.to raise_error(Puppet::Error, %r{#{facts[:operatingsystem]} not supported}) }
     end
   end
 end
-# vim:foldmethod=syntax
