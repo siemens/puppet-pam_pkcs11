@@ -203,6 +203,17 @@ class pam_pkcs11::params {
     },
     'card_remove' => {
       'on_error' => 'ignore',
+      'action'   => ['/bin/true'],
+    },
+    'expire_time' => {
+      'on_error' => 'ignore',
+      'action'   => ['/bin/true'],
+    },
+  }
+
+  $pkcs11_event_opts_lock_screen_on_card_remove = {
+    'card_remove' => {
+      'on_error' => 'ignore',
       'action'   => [
         "canberra-gtk-play -i device-removed -d 'Smartcard removed'",
         'xscreensaver-command -lock',
@@ -211,10 +222,6 @@ class pam_pkcs11::params {
         'qdbus org.kde.ScreenSaver /ScreenSaver Lock',
         'loginctl lock-session',
       ],
-    },
-    'expire_time' => {
-      'on_error' => 'ignore',
-      'action'   => ['/bin/true'],
     },
   }
 }

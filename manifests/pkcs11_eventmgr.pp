@@ -37,23 +37,34 @@
 #
 #   Default: $pam_pkcs11::params::pkcs11_event_opts
 #
+# @param event_opts_screen_lock
+#   Hash
+#
+#   Default: $pam_pkcs11::params::pkcs11_event_opts_lock_screen_on_card_remove
+#
 # @param autostart_method
 #   String
 #
 #   Default: $pam_pkcs11::params::pkcs11_eventmgr_autostart_method,
 #
+# @param lock_screen_on_card_removal
+#   Boolean
+#
+#   Default: true
 class pam_pkcs11::pkcs11_eventmgr (
-  Boolean                 $debug            = false,
-  Boolean                 $daemonize        = true,
-  Integer[0]              $polling_time     = 1,
-  Integer[0]              $expire_time      = 0,
+  Boolean                 $debug                  = false,
+  Boolean                 $daemonize              = true,
+  Integer[0]              $polling_time           = 1,
+  Integer[0]              $expire_time            = 0,
   Variant[Enum['default'],
-  Stdlib::AbsolutePath]   $pkcs11_module    = 'default',
-  Pam_pkcs11::EventCfgOpt $event_opts       = {},
-  Pam_pkcs11::EventCfg    $event_opts_base  = $pam_pkcs11::params::pkcs11_event_opts,
+  Stdlib::AbsolutePath]   $pkcs11_module          = 'default',
+  Pam_pkcs11::EventCfgOpt $event_opts             = {},
+  Pam_pkcs11::EventCfg    $event_opts_base        = $pam_pkcs11::params::pkcs11_event_opts,
+  Pam_pkcs11::EventCfgOpt $event_opts_screen_lock = $pam_pkcs11::params::pkcs11_event_opts_lock_screen_on_card_remove,
   Enum['systemd_service',
     'xdg_autostart',
   'none']                 $autostart_method = $pam_pkcs11::params::pkcs11_eventmgr_autostart_method,
+  Boolean                 $lock_screen_on_card_removal = true,
 ) inherits pam_pkcs11::params {
   require 'pam_pkcs11::install'
   include 'pam_pkcs11'
@@ -64,7 +75,11 @@ class pam_pkcs11::pkcs11_eventmgr (
     $pkcs11_module_file = $pkcs11_module
   }
 
-  $merged_event_opts = merge($event_opts_base, $event_opts)
+  if $lock_screen_on_card_removal {
+    $merged_event_opts = $event_opts_base + $event_opts_screen_lock + $event_opts
+  } else {
+    $merged_event_opts = $event_opts_base + $event_opts
+  }
 
   File {
     ensure => present,
