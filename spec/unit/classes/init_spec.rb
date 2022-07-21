@@ -25,7 +25,24 @@ describe 'pam_pkcs11', type: :class do
         when 'Gentoo'
           'Gentoo'
         when 'Debian'
-          'Debian'
+          case facts[:os]['name']
+          when 'Debian'
+            case facts[:os]['release']['major']
+            when '7', '8'
+              'Debian-old'
+            else
+              'Debian'
+            end
+          when 'Ubuntu'
+            case facts[:os]['release']['major']
+            when '12.04', '14.04'
+              'Debian-old'
+            else
+              'Debian'
+            end
+          else
+            'invalid-init-spec'
+          end
         when 'RedHat', 'Suse'
           if facts[:os].fetch('architecture', facts[:architecture]).match?(%r{i[3-6]86})
             facts[:os]['release']['major'] == '5' ? ['RedHat', '32', 'RedHat-5'] : ['RedHat', '32']

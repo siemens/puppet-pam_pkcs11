@@ -23,12 +23,35 @@ describe 'pam_pkcs11::pkcs11_eventmgr', type: :class do
         end
       end
 
+      let(:gcc_arch) do
+        if facts[:os].fetch('architecture', facts[:architecture]) == 'amd64'
+          'x86_64'
+        else
+          facts[:os].fetch('architecture', facts[:architecture])
+        end
+      end
+
       let(:default_module_path) do
         case facts[:os]['family']
         when 'Gentoo'
           '/usr/lib/opensc-pkcs11.so'
         when 'Debian'
-          '/usr/lib/opensc-pkcs11.so'
+          case facts[:os]['name']
+          when 'Debian'
+            case facts[:os]['release']['major']
+            when '7', '8'
+              '/usr/lib/opensc-pkcs11.so'
+            else
+              "/usr/lib/#{gcc_arch}-linux-gnu/pkcs11/opensc-pkcs11.so"
+            end
+          when 'Ubuntu'
+            case facts[:os]['release']['major']
+            when '12.04', '14.04'
+              '/usr/lib/opensc-pkcs11.so'
+            else
+              "/usr/lib/#{gcc_arch}-linux-gnu/pkcs11/opensc-pkcs11.so"
+            end
+          end
         when 'RedHat', 'Suse'
           "/usr/#{lib}/pkcs11/opensc-pkcs11.so"
         end
@@ -45,17 +68,17 @@ describe 'pam_pkcs11::pkcs11_eventmgr', type: :class do
           case facts[:os]['name']
           when 'Debian'
             case facts[:os]['release']['major']
-            when '8'
-              it_behaves_like('an OS that uses systemd by default')
-            else
+            when '6', '7'
               it_behaves_like('an OS that does not use systemd by default')
+            else
+              it_behaves_like('an OS that uses systemd by default')
             end
           when 'Ubuntu'
             case facts[:os]['release']['major']
-            when '15.04', '15.10', '16.04'
-              it_behaves_like('an OS that uses systemd by default')
-            else
+            when '12.04', '14.04'
               it_behaves_like('an OS that does not use systemd by default')
+            else
+              it_behaves_like('an OS that uses systemd by default')
             end
           end
         when 'RedHat'
