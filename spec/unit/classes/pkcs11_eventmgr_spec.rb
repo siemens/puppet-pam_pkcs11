@@ -476,7 +476,7 @@ describe 'pam_pkcs11::pkcs11_eventmgr', type: :class do
             { autostart_method: 'invalid string' }
           end
 
-          it { is_expected.to raise_error(Puppet::Error, %r{does not match}) }
+          it { is_expected.to raise_error(Puppet::Error, %r{Evaluation Error}) }
         end
 
         context 'to an invalid type' do
@@ -484,7 +484,7 @@ describe 'pam_pkcs11::pkcs11_eventmgr', type: :class do
             { autostart_method: false }
           end
 
-          it { is_expected.to raise_error(Puppet::PreformattedError, %r{expects a String value}) }
+          it { is_expected.to raise_error(Puppet::Error, %r{Evaluation Error}) }
         end
       end
     end

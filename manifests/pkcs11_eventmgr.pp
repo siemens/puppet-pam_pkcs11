@@ -32,19 +32,28 @@
 #
 #   Default: {}
 #
+# @param event_opts_base
+#   Hash
+#
+#   Default: $pam_pkcs11::params::pkcs11_event_opts
+#
 # @param autostart_method
 #   String
 #
 #   Default: $pam_pkcs11::params::pkcs11_eventmgr_autostart_method,
 #
 class pam_pkcs11::pkcs11_eventmgr (
-  Boolean    $debug            = false,
-  Boolean    $daemonize        = true,
-  Integer[0] $polling_time     = 1,
-  Integer[0] $expire_time      = 0,
-  String     $pkcs11_module    = 'default',
-  Hash       $event_opts       = {},
-  String     $autostart_method = $pam_pkcs11::params::pkcs11_eventmgr_autostart_method,
+  Boolean                 $debug            = false,
+  Boolean                 $daemonize        = true,
+  Integer[0]              $polling_time     = 1,
+  Integer[0]              $expire_time      = 0,
+  Variant[Enum['default'],
+  Stdlib::AbsolutePath]   $pkcs11_module    = 'default',
+  Pam_pkcs11::EventCfgOpt $event_opts       = {},
+  Pam_pkcs11::EventCfg    $event_opts_base  = $pam_pkcs11::params::pkcs11_event_opts,
+  Enum['systemd_service',
+    'xdg_autostart',
+  'none']                 $autostart_method = $pam_pkcs11::params::pkcs11_eventmgr_autostart_method,
 ) inherits pam_pkcs11::params {
   require 'pam_pkcs11::install'
   include 'pam_pkcs11'
@@ -52,26 +61,10 @@ class pam_pkcs11::pkcs11_eventmgr (
   if $pkcs11_module == 'default' {
     $pkcs11_module_file = $pam_pkcs11::merged_pkcs11_module['module']
   } else {
-    validate_absolute_path($pkcs11_module)
-    if is_array($pkcs11_module) {
-      fail('The paremeter `pkcs11_module` must be a String.  It is an Array.')
-    }
     $pkcs11_module_file = $pkcs11_module
   }
 
-  validate_re($autostart_method, '^(?:systemd_service|xdg_autostart|none)$')
-
-  $merged_event_opts = merge($pam_pkcs11::params::pkcs11_event_opts, $event_opts)
-
-  validate_re($merged_event_opts['card_insert']['on_error'], '^(?:ignore|return|quit)$')
-  validate_re($merged_event_opts['card_remove']['on_error'], '^(?:ignore|return|quit)$')
-  validate_re($merged_event_opts['expire_time']['on_error'], '^(?:ignore|return|quit)$')
-
-  # TODO: Use `validate_cmd()` on individual action strings once support for
-  #       Puppet 3.x and lower is dropped (requires iteration).
-  validate_array($merged_event_opts['card_insert']['action'])
-  validate_array($merged_event_opts['card_remove']['action'])
-  validate_array($merged_event_opts['expire_time']['action'])
+  $merged_event_opts = merge($event_opts_base, $event_opts)
 
   File {
     ensure => present,

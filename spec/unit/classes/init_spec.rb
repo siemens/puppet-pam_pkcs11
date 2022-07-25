@@ -508,13 +508,13 @@ describe 'pam_pkcs11', type: :class do
         context 'to an invalid value' do
           let(:params) { { 'ca_dir_sourceselect' => 'none' } }
 
-          it { is_expected.to raise_error(Puppet::Error, %r{does not match}) }
+          it { is_expected.to raise_error(Puppet::Error, %r{Evaluation Error}) }
         end
 
         context 'to a non-String' do
           let(:params) { { 'ca_dir_sourceselect' => true } }
 
-          it { is_expected.to raise_error(Puppet::PreformattedError, %r{expects a String value}) }
+          it { is_expected.to raise_error(Puppet::Error, %r{Evaluation Error}) }
         end
       end
 

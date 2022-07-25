@@ -44,9 +44,17 @@
 #   A hash containing configuration for the selected PKCS #11 module.  The
 #   key/value pairs in this hash are map directly to the `pam_pkcs11` hash in
 #   `pam_pkcs11.conf(5)`.  The provided hash is merged with the defaults from
-#   `params.pp`.
+#   `pkcs11_module_base`.
 #
-#   Default: (see params.pp)
+#   Default: {}
+#
+# @param pkcs11_module_base
+#   Hash
+#
+#   A hash containing the default configuration for the selected PKCS #11 module
+#   that are used as a base for `pkcs11_module`.
+#
+#   Default: (see params.pp:pkcs11_module)
 #
 # @param use_mappers
 #   Array
@@ -61,9 +69,17 @@
 #   A nested hash with options for each mapper in use.  The first-level key name
 #   specifies the mapper.  Key/value pairs from each sub-hash map directly to
 #   the `mapper` options in `pam_pkcs11.conf(5)`.  The provided hash is merged
-#   with the defaults from `params.pp`.
+#   with the defaults from `mapper_options_base`.
 #
-#   Default: (see params.pp)
+#   Default: {}
+#
+# @param mapper_options_base
+#   Hash
+#
+#   A nested hash with the default options for each mapper in use which are used
+#   as a base for the configuration in `mapper_options`.
+#
+#   Default: (see params.pp:mapper_options)
 #
 # @param digest_mappings
 #   Hash
@@ -105,12 +121,12 @@
 #
 #     # Use a single source directory
 #     class { 'pam_pkcs11':
-#       ca_dir_source => ['puppet:///modules/files/ca_files'],
+#       ca_dir_source       => ['puppet:///modules/files/ca_files'],
 #     }
 #
 #     # Use a primary source directory with a fallback server
 #     class { 'pam_pkcs11':
-#       ca_dir_source => [
+#       ca_dir_source       => [
 #         'puppet:///modules/files/ca_files',
 #         'puppet://puppet-files.example.org/modules/files/ca_files',
 #       ],
@@ -118,7 +134,7 @@
 #
 #     # Combine the files from two source directories
 #     class { 'pam_pksc11':
-#       ca_dir_source => [
+#       ca_dir_source       => [
 #         'puppet:///modules/files/ca_files',
 #         'puppet:///modules/ca_certs/certs',
 #       ],
@@ -148,104 +164,46 @@ class pam_pkcs11 (
   Boolean       $use_authtok            = false,
   Boolean       $card_only              = false,
   Boolean       $wait_for_card          = false,
-  Hash          $pkcs11_module          = {},
+  Struct[
+    name             => Optional[String],
+    module           => Optional[Variant[Enum['internal'], Stdlib::Absolutepath]],
+    slot_description => Optional[String],
+    slot_num         => Optional[Integer],
+    ca_dir           => Optional[Stdlib::Absolutepath],
+    crl_dir          => Optional[Stdlib::Absolutepath],
+    nss_dir          => Optional[Stdlib::Absolutepath],
+    support_threads  => Optional[Boolean],
+    cert_policy      => Optional[String],
+    token_type       => Optional[String]
+  ]             $pkcs11_module          = {},
+  Struct[
+    name             => String,
+    module           => Variant[Enum['internal'], Stdlib::Absolutepath],
+    slot_description => String,
+    slot_num         => Optional[Integer],
+    ca_dir           => Optional[Stdlib::Absolutepath],
+    crl_dir          => Stdlib::Absolutepath,
+    nss_dir          => Optional[Stdlib::Absolutepath],
+    support_threads  => Boolean,
+    cert_policy      => String,
+    token_type       => String
+  ]             $pkcs11_module_base     = $pam_pkcs11::params::pkcs11_module,
   Array[String] $use_mappers            = ['digest'],
-  Hash          $mapper_options         = {},
+  Pam_pkcs11::MapperOptionsOpt $mapper_options         = {},
+  Pam_pkcs11::MapperOptions    $mapper_options_base    = $pam_pkcs11::params::mapper_options,
   Hash          $digest_mappings        = {},
   Hash          $subject_mappings       = {},
   Hash          $uid_mappings           = {},
   Array[String] $ca_dir_source          = [],
-  String        $ca_dir_sourceselect    = 'first',
+  Enum[
+    'first',
+  'all']        $ca_dir_sourceselect    = 'first',
   Boolean       $manage_pkcs11_eventmgr = true,
 ) inherits pam_pkcs11::params {
   if $ca_dir_source != [] and $facts['os']['family'] == 'RedHat' { fail('The `ca_dir_source` parameter is not supported on RedHat OS families.') }
-  validate_re($ca_dir_sourceselect, '^(?:first|all)$')
-  validate_bool($manage_pkcs11_eventmgr)
 
-  $merged_pkcs11_module  = merge($pam_pkcs11::params::pkcs11_module, $pkcs11_module)
-
-  # PKCS#11 Module option validation
-  validate_string($merged_pkcs11_module['name'])
-  validate_absolute_path($merged_pkcs11_module['module'])
-  validate_string($merged_pkcs11_module['slot_description'])
-  if $merged_pkcs11_module['slot_num'] != undef { validate_integer($merged_pkcs11_module['slot_num']) }
-  if $merged_pkcs11_module['ca_dir'] != undef { validate_absolute_path($merged_pkcs11_module['ca_dir']) }
-  validate_absolute_path($merged_pkcs11_module['crl_dir'])
-  if $merged_pkcs11_module['nss_dir'] != undef { validate_absolute_path($merged_pkcs11_module['nss_dir']) }
-  validate_bool($merged_pkcs11_module['support_threads'])
-  validate_string($merged_pkcs11_module['cert_policy'])
-  validate_string($merged_pkcs11_module['token_type'])
-
-  $merged_mapper_options = deep_merge($pam_pkcs11::params::mapper_options, $mapper_options)
-
-  # Mapper option validation (Oh, woe is me.)
-  validate_bool($merged_mapper_options['digest']['debug'])
-  if $merged_mapper_options['digest']['module'] != 'internal' { validate_absolute_path($merged_mapper_options['digest']['module']) }
-  validate_re($merged_mapper_options['digest']['algorithm'], '^(?:null|md2|md4|md5|sha|sha1|dss|dss1|ripemd160)$')
-  validate_string($merged_mapper_options['digest']['mapfile'])
-  validate_bool($merged_mapper_options['ldap']['debug'])
-  validate_absolute_path($merged_mapper_options['ldap']['module'])
-  validate_string($merged_mapper_options['ldap']['ldaphost'])
-  validate_string($merged_mapper_options['ldap']['URI'])
-  validate_integer($merged_mapper_options['ldap']['scope'], 2)
-  validate_string($merged_mapper_options['ldap']['binddn'])
-  validate_string($merged_mapper_options['ldap']['passwd'])
-  validate_string($merged_mapper_options['ldap']['base'])
-  validate_string($merged_mapper_options['ldap']['attribute'])
-  validate_string($merged_mapper_options['ldap']['filter'])
-  validate_re($merged_mapper_options['ldap']['ssl'], '^(?:off|on|tls|ssl)$')
-  validate_absolute_path($merged_mapper_options['ldap']['tls_cacertfile'])
-  if $merged_mapper_options['ldap']['tls_cacertdir'] != undef { validate_absolute_path($merged_mapper_options['ldap']['tls_cacertdir']) }
-  if $merged_mapper_options['ldap']['tls_chekpeer'] != undef {
-    validate_re($merged_mapper_options['ldap']['tls_checkpeer'], '^(?:never|allow|try|demand|hard)$')
-  }
-  if $merged_mapper_options['ldap']['tls_ciphers'] != undef { validate_string($merged_mapper_options['ldap']['tls_ciphers']) }
-  if $merged_mapper_options['ldap']['tls_cert'] != undef { validate_absolute_path($merged_mapper_options['ldap']['tls_cert']) }
-  if $merged_mapper_options['ldap']['tls_key'] != undef { validate_absolute_path($merged_mapper_options['ldap']['tls_key']) }
-  validate_absolute_path($merged_mapper_options['ldap']['tls_randfile'])
-  validate_bool($merged_mapper_options['generic']['debug'])
-  if $merged_mapper_options['generic']['module'] != 'internal' { validate_absolute_path($merged_mapper_options['generic']['module']) }
-  validate_string($merged_mapper_options['generic']['mapfile'])
-  validate_bool($merged_mapper_options['generic']['ignorecase'])
-  validate_re($merged_mapper_options['generic']['cert_item'], '^(?:cn|subject|kpn|email|upn|uid)$')
-  validate_bool($merged_mapper_options['generic']['use_getpwent'])
-  validate_bool($merged_mapper_options['subject']['debug'])
-  if $merged_mapper_options['subject']['module'] != 'internal' { validate_absolute_path($merged_mapper_options['subject']['module']) }
-  validate_string($merged_mapper_options['subject']['mapfile'])
-  validate_bool($merged_mapper_options['subject']['ignorecase'])
-  validate_bool($merged_mapper_options['openssh']['debug'])
-  validate_absolute_path($merged_mapper_options['openssh']['module'])
-  validate_bool($merged_mapper_options['opensc']['debug'])
-  validate_absolute_path($merged_mapper_options['opensc']['module'])
-  validate_bool($merged_mapper_options['pwent']['debug'])
-  if $merged_mapper_options['pwent']['module'] != 'internal' { validate_absolute_path($merged_mapper_options['pwent']['module']) }
-  validate_bool($merged_mapper_options['pwent']['ignorecase'])
-  validate_bool($merged_mapper_options['null']['debug'])
-  if $merged_mapper_options['null']['module'] != 'internal' { validate_absolute_path($merged_mapper_options['null']['module']) }
-  validate_bool($merged_mapper_options['null']['default_match'])
-  validate_string($merged_mapper_options['null']['default_user'])
-  validate_bool($merged_mapper_options['cn']['debug'])
-  if $merged_mapper_options['cn']['module'] != 'internal' { validate_absolute_path($merged_mapper_options['cn']['module']) }
-  validate_string($merged_mapper_options['cn']['mapfile'])
-  validate_bool($merged_mapper_options['cn']['ignorecase'])
-  validate_bool($merged_mapper_options['mail']['debug'])
-  if $merged_mapper_options['mail']['module'] != 'internal' { validate_absolute_path($merged_mapper_options['mail']['module']) }
-  validate_string($merged_mapper_options['mail']['mapfile'])
-  validate_bool($merged_mapper_options['mail']['ignorecase'])
-  validate_bool($merged_mapper_options['mail']['ignoredomain'])
-  validate_bool($merged_mapper_options['ms']['debug'])
-  if $merged_mapper_options['ms']['module'] != 'internal' { validate_absolute_path($merged_mapper_options['ms']['module']) }
-  validate_bool($merged_mapper_options['ms']['ignorecase'])
-  validate_bool($merged_mapper_options['ms']['ignoredomain'])
-  validate_string($merged_mapper_options['ms']['domainname'])
-  validate_bool($merged_mapper_options['krb']['debug'])
-  if $merged_mapper_options['krb']['module'] != 'internal' { validate_absolute_path($merged_mapper_options['krb']['module']) }
-  validate_bool($merged_mapper_options['krb']['ignorecase'])
-  validate_string($merged_mapper_options['krb']['mapfile'])
-  validate_bool($merged_mapper_options['uid']['debug'])
-  if $merged_mapper_options['uid']['module'] != 'internal' { validate_absolute_path($merged_mapper_options['uid']['module']) }
-  validate_bool($merged_mapper_options['uid']['ignorecase'])
-  validate_string($merged_mapper_options['uid']['mapfile'])
+  $merged_pkcs11_module  = merge($pkcs11_module_base, $pkcs11_module)
+  $merged_mapper_options = deep_merge($mapper_options_base, $mapper_options)
 
   # HACK: This doesn't work in Puppet 3.x so validation is done in the template.
   # $digest_mappings.each | String $uid, String $fingerprint | {

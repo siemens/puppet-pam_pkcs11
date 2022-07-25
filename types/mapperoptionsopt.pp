@@ -1,0 +1,15 @@
+type Pam_pkcs11::MapperOptionsOpt = Struct[
+    digest  => Optional[Pam_pkcs11::MapperDigest],
+    ldap    => Optional[Pam_pkcs11::MapperLdap],
+    generic => Optional[Pam_pkcs11::MapperGeneric],
+    subject => Optional[Pam_pkcs11::MapperSubject],
+    openssh => Optional[Pam_pkcs11::MapperOpenSSH],
+    opensc  => Optional[Pam_pkcs11::MapperOpenSc],
+    pwent   => Optional[Pam_pkcs11::MapperPwent],
+    null    => Optional[Pam_pkcs11::MapperNull],
+    cn      => Optional[Pam_pkcs11::MapperCn],
+    mail    => Optional[Pam_pkcs11::MapperMail],
+    ms      => Optional[Pam_pkcs11::MapperMs],
+    krb     => Optional[Pam_pkcs11::MapperKrb],
+    uid     => Optional[Pam_pkcs11::MapperUid],
+]
