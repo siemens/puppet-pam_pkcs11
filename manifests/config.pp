@@ -61,4 +61,23 @@ class pam_pkcs11::config inherits pam_pkcs11 {
       path        => ['/usr/local/bin', '/usr/local/sbin', '/usr/bin', '/usr/sbin', '/bin', '/sbin'],
     }
   }
+
+  if $pam_pkcs11::pam_config == 'pam-auth-update' {
+    file { '/usr/share/pam-configs':
+      ensure => directory,
+      mode   => '0755',
+    }
+
+    file { '/usr/share/pam-configs/pkcs11':
+      ensure  => file,
+      mode    => '0644',
+      content => template('pam_pkcs11/pam-config.erb'),
+    }
+
+    exec { 'pam-auth-update':
+      path        => ['/usr/local/sbin', '/usr/local/bin', '/usr/sbin', '/usr/bin', '/sbin', '/bin'],
+      subscribe   => File['/usr/share/pam-configs/pkcs11'],
+      refreshonly => true,
+    }
+  }
 }

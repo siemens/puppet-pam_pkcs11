@@ -60,6 +60,12 @@ describe 'pam_pkcs11', type: :class do
         File.open(File.join(fixture_path, 'default_files', os_files_path, 'pkcs11_eventmgr.conf')).read
       end
 
+      if facts[:os]['family'] == 'Debian'
+        let(:default_pam_config_pkcs11) do
+          File.open(File.join(fixture_path, 'default_files', os_files_path, 'pam-config.conf')).read
+        end
+      end
+
       context 'without any parameters' do
         #
         # self
@@ -98,6 +104,30 @@ describe 'pam_pkcs11', type: :class do
             )
             .with_content(default_pam_pkcs11_conf)
             .that_requires('File[/etc/pam_pkcs11]')
+        end
+
+        if facts[:os]['family'] == 'Debian'
+          it do
+            is_expected.to contain_file('/usr/share/pam-configs')
+              .with(
+                'ensure' => 'directory',
+                'owner'  => 'root',
+                'group'  => 'root',
+                'mode'   => '0755',
+              )
+          end
+
+          it do
+            is_expected.to contain_file('/usr/share/pam-configs/pkcs11')
+              .with(
+                'ensure' => 'file',
+                'owner'  => 'root',
+                'group'  => 'root',
+                'mode'   => '0644',
+              )
+              .with_content(default_pam_config_pkcs11)
+              .that_requires('File[/usr/share/pam-configs]')
+          end
         end
 
         #
