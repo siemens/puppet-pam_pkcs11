@@ -305,7 +305,7 @@ describe 'pam_pkcs11', type: :class do
           }
         end
 
-        it { is_expected.to raise_error(Puppet::Error, %r{is not a string}) }
+        it { is_expected.to raise_error(Puppet::Error, %r{Evaluation Error}) }
       end
 
       context 'when the first fingerprint in `digest_mappings` is invalid' do
@@ -318,7 +318,7 @@ describe 'pam_pkcs11', type: :class do
           }
         end
 
-        it { is_expected.to raise_error(Puppet::Error, %r{does not match}) }
+        it { is_expected.to raise_error(Puppet::Error, %r{Evaluation Error}) }
       end
 
       context 'when the second fingerprint in `digest_mappings` is invalid' do
@@ -331,7 +331,7 @@ describe 'pam_pkcs11', type: :class do
           }
         end
 
-        it { is_expected.to raise_error(Puppet::Error, %r{does not match}) }
+        it { is_expected.to raise_error(Puppet::Error, %r{Evaluation Error}) }
       end
 
       context 'when `subject_mappings` contains multiple good mappings' do
@@ -366,7 +366,7 @@ describe 'pam_pkcs11', type: :class do
           }
         end
 
-        it { is_expected.to raise_error(Puppet::Error, %r{is not a string}) }
+        it { is_expected.to raise_error(Puppet::Error, %r{Evaluation Error}) }
       end
 
       context 'when `uid_mappings` contains multiple good mappings' do
@@ -401,7 +401,7 @@ describe 'pam_pkcs11', type: :class do
           }
         end
 
-        it { is_expected.to raise_error(Puppet::Error, %r{is not a string}) }
+        it { is_expected.to raise_error(Puppet::Error, %r{Evaluation Error}) }
       end
 
       shared_examples_for 'a host with an OpenSSL CA hash link directory' do |sourceselect|
