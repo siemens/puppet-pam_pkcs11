@@ -409,6 +409,45 @@ describe 'pam_pkcs11::pkcs11_eventmgr', type: :class do
         end
       end
 
+      context 'when `lock_screen_on_card_removal` is set' do
+        context 'to false' do
+          let(:params) { { 'lock_screen_on_card_removal' => false } }
+
+          it do
+            is_expected.to contain_file('pkcs11_eventmgr.conf').with_content(
+              <<-END.gsub(%r{^[[:blank:]]{16}}, ''),
+                ########################################################################
+                #             WARNING: This file is managed by Puppet.                 #
+                #               Manual changes will be overwritten.                    #
+                ########################################################################
+                pkcs11_eventmgr {
+                  debug = false;
+                  daemon = true;
+                  polling_time = 1;
+                  expire_time = 0;
+                  pkcs11_module = "#{default_module_path}";
+
+                  event card_insert {
+                    on_error = "ignore";
+                    action = "/bin/true";
+                  }
+
+                  event card_remove {
+                    on_error = "ignore";
+                    action = "/bin/true";
+                  }
+
+                  event expire_time {
+                    on_error = "ignore";
+                    action = "/bin/true";
+                  }
+                }
+              END
+            )
+          end
+        end
+      end
+
       context 'when autostart_method is set' do
         context 'to systemd_service' do
           let(:params) do

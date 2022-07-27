@@ -23,20 +23,54 @@
 # @param nullok
 #   Boolean
 #
+#   Whether or not to allow empty passwords.  Changes the `nullok` configuration
+#   option in the `pam_pkcs11.conf` configuration file.
+#
+#   Default: false
+#
 # @param use_first_pass
 #   Boolean
+#
+#   Whether or not to prompt the user for the password or to take it from the
+#   `PAM_` items instead.  Changes the `use_first_pass` configuration option in
+#   the `pam_pkcs11.conf` configuration file.
+#
+#   Default: false
 #
 # @param try_first_pass
 #   Boolean
 #
+#   Whether or not to prompt the user for the password unless the
+#   `PAM_(OLD)AUTHTOK` is unset.  Changes the `try_first_pass` configuration
+#   option in the `pam_pkcs11.conf` configuration file.
+#
+#   Default: true
+#
 # @param use_authtok
 #   Boolean
+#
+#   Like `try_first_pass` but fail if the new `PAM_AUTHTOK` has not been
+#   previously set.  Changes the `use_authtok` configuration option in the
+#   `pam_pkcs11.conf` configuration file.
+#
+#   Default: false
 #
 # @param card_only
 #   Boolean
 #
+#   Whether or not to get the userid only from the card.  Changes the
+#   `card_only` in the `pam_pkcs11.conf` configuration file.
+#
+#   Default: false
+#
 # @param wait_for_card
 #   Boolean
+#
+#   Whether or not the pam authentification should wait for a card when
+#   `card_only` is used.  Changes the `wait_for_card` configuration option in
+#   the `pam_pkcs11.conf` configuration file.
+#
+#   Default: false
 #
 # @param pkcs11_module
 #   Hash
@@ -85,18 +119,26 @@
 #   Hash
 #
 #   A hash of user/fingerprint pairs for use with the `digest` mapper.  Each key
-#   name represents a UID, its associated value represents the fingerprint of
-#   the user's certificate.
+#   name represents a UID/username, its associated value represents the
+#   fingerprint of the user's certificate.
 #
 #   Default: {}
 #
 # @param subject_mappings
 #   Hash
 #
+#   A hash of user/certificate subject pairs for use with the `subject` mapper.
+#   Each key name represents a UID/username, its associated value represents the
+#   certificate subject of the user's certificate.
+#
 #   Default: {}
 #
 # @param uid_mappings
 #   Hash
+#
+#   A hash of user/certificate uid pairs fo ruse with the `uid` mapper.  Each
+#   key name represents a UID/username, its associated value represents the
+#   certificate unique id (UID) of the user's certificate.
 #
 #   Default: {}
 #
@@ -133,7 +175,7 @@
 #     }
 #
 #     # Combine the files from two source directories
-#     class { 'pam_pksc11':
+#     class { 'pam_pkcs11':
 #       ca_dir_source       => [
 #         'puppet:///modules/files/ca_files',
 #         'puppet:///modules/ca_certs/certs',
@@ -146,6 +188,13 @@
 # @param ca_dir_sourceselect
 #   String
 #
+#   Whether to copy all valid sources, or just the first one to the ca dir.
+#   This parameter only affects recursive directory copies; by default, the
+#   first valid source is the only one used, but if this parameter is set to
+#   all, then all valid sources in `ca_dir_source` will have all of their
+#   contents copied to the local system.  If a given file exists in more than
+#   one source, the version from the earliest source in the list will be used.
+#
 #   Default: 'first'
 #
 # @param manage_pkcs11_eventmgr
@@ -156,14 +205,14 @@
 #   Default: true
 #
 class pam_pkcs11 (
-  String        $package_name           = $pam_pkcs11::params::package_name,
-  Boolean       $debug                  = false,
-  Boolean       $nullok                 = false,
-  Boolean       $use_first_pass         = false,
-  Boolean       $try_first_pass         = false,
-  Boolean       $use_authtok            = false,
-  Boolean       $card_only              = false,
-  Boolean       $wait_for_card          = false,
+  String                       $package_name           = $pam_pkcs11::params::package_name,
+  Boolean                      $debug                  = false,
+  Boolean                      $nullok                 = false,
+  Boolean                      $use_first_pass         = false,
+  Boolean                      $try_first_pass         = false,
+  Boolean                      $use_authtok            = false,
+  Boolean                      $card_only              = false,
+  Boolean                      $wait_for_card          = false,
   Struct[
     name             => Optional[String],
     module           => Optional[Variant[Enum['internal'], Stdlib::Absolutepath]],
@@ -175,7 +224,7 @@ class pam_pkcs11 (
     support_threads  => Optional[Boolean],
     cert_policy      => Optional[String],
     token_type       => Optional[String]
-  ]             $pkcs11_module          = {},
+  ]                            $pkcs11_module          = {},
   Struct[
     name             => String,
     module           => Variant[Enum['internal'], Stdlib::Absolutepath],
@@ -187,28 +236,24 @@ class pam_pkcs11 (
     support_threads  => Boolean,
     cert_policy      => String,
     token_type       => String
-  ]             $pkcs11_module_base     = $pam_pkcs11::params::pkcs11_module,
-  Array[String] $use_mappers            = ['digest'],
+  ]                            $pkcs11_module_base     = $pam_pkcs11::params::pkcs11_module,
+  Array[Pam_pkcs11::Mappers]   $use_mappers            = ['digest'],
   Pam_pkcs11::MapperOptionsOpt $mapper_options         = {},
   Pam_pkcs11::MapperOptions    $mapper_options_base    = $pam_pkcs11::params::mapper_options,
-  Hash          $digest_mappings        = {},
-  Hash          $subject_mappings       = {},
-  Hash          $uid_mappings           = {},
-  Array[String] $ca_dir_source          = [],
+  Hash[String,
+  Pam_pkcs11::Fingerprint]     $digest_mappings        = {},
+  Hash[String, String]         $subject_mappings       = {},
+  Hash[String, String]         $uid_mappings           = {},
+  Array[Stdlib::Filesource]    $ca_dir_source          = [],
   Enum[
     'first',
-  'all']        $ca_dir_sourceselect    = 'first',
-  Boolean       $manage_pkcs11_eventmgr = true,
+  'all']                       $ca_dir_sourceselect    = 'first',
+  Boolean                      $manage_pkcs11_eventmgr = true,
 ) inherits pam_pkcs11::params {
   if $ca_dir_source != [] and $facts['os']['family'] == 'RedHat' { fail('The `ca_dir_source` parameter is not supported on RedHat OS families.') }
 
   $merged_pkcs11_module  = merge($pkcs11_module_base, $pkcs11_module)
   $merged_mapper_options = deep_merge($mapper_options_base, $mapper_options)
-
-  # HACK: This doesn't work in Puppet 3.x so validation is done in the template.
-  # $digest_mappings.each | String $uid, String $fingerprint | {
-  #   validate_re($fingerprint, '^[[:xdigit:]]{2}(:[[:xdigit:]]{2}){18}:[[:xdigit:]]{2}$')
-  # }
 
   include 'pam_pkcs11::install'
   include 'pam_pkcs11::config'
