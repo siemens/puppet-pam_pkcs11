@@ -1,0 +1,4 @@
+desc 'Run markdown lint'
+task :markdownlint do
+  sh 'bundle exec mdl *.md'
+end
