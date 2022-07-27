@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'pam_pkcs11::pkcs11_eventmgr', :type => :class do
+describe 'pam_pkcs11::pkcs11_eventmgr', type: :class do
   shared_examples_for 'an OS that uses systemd by default' do
     it { is_expected.to contain_file('pkcs11_eventmgr.service') }
   end
@@ -16,7 +16,7 @@ describe 'pam_pkcs11::pkcs11_eventmgr', :type => :class do
       end
 
       let(:lib) do
-        if facts[:architecture] =~ /i[3-6]86/
+        if facts[:os].fetch('architecture', facts[:architecture]).match?(%r{i[3-6]86})
           'lib'
         else
           'lib64'
@@ -24,7 +24,7 @@ describe 'pam_pkcs11::pkcs11_eventmgr', :type => :class do
       end
 
       let(:default_module_path) do
-        case facts[:osfamily]
+        case facts[:os]['family']
         when 'Gentoo'
           '/usr/lib/opensc-pkcs11.so'
         when 'Debian'
@@ -36,22 +36,22 @@ describe 'pam_pkcs11::pkcs11_eventmgr', :type => :class do
 
       context 'without any parameters' do
         it { is_expected.to compile.with_all_deps }
-        it { is_expected.to contain_class('pam_pkcs11::pkcs11_eventmgr').that_requires('pam_pkcs11::install') }
+        it { is_expected.to contain_class('pam_pkcs11::pkcs11_eventmgr').that_requires('Class[pam_pkcs11::install]') }
 
-        case facts[:osfamily]
+        case facts[:os]['family']
         when 'Gentoo'
           it_behaves_like('an OS that does not use systemd by default')
         when 'Debian'
-          case facts[:operatingsystem]
+          case facts[:os]['name']
           when 'Debian'
-            case facts[:operatingsystemmajrelease]
+            case facts[:os]['release']['major']
             when '8'
               it_behaves_like('an OS that uses systemd by default')
             else
               it_behaves_like('an OS that does not use systemd by default')
             end
           when 'Ubuntu'
-            case facts[:operatingsystemmajrelease]
+            case facts[:os]['release']['major']
             when '15.04', '15.10', '16.04'
               it_behaves_like('an OS that uses systemd by default')
             else
@@ -59,9 +59,9 @@ describe 'pam_pkcs11::pkcs11_eventmgr', :type => :class do
             end
           end
         when 'RedHat'
-          case facts[:operatingsystem]
+          case facts[:os]['name']
           when 'RedHat', 'CentOS', 'Scientific', 'OracleLinux'
-            case facts[:operatingsystemmajrelease]
+            case facts[:os]['release']['major']
             when '7'
               it_behaves_like('an OS that uses systemd by default')
             else
@@ -71,7 +71,7 @@ describe 'pam_pkcs11::pkcs11_eventmgr', :type => :class do
             it_behaves_like('an OS that uses systemd by default')
           end
         when 'Suse'
-          case facts[:operatingsystemmajrelease]
+          case facts[:os]['release']['major']
           when '12', '13', '42'
             it_behaves_like('an OS that uses systemd by default')
           else
@@ -88,7 +88,7 @@ describe 'pam_pkcs11::pkcs11_eventmgr', :type => :class do
             'owner'   => 'root',
             'group'   => 'root',
             'mode'    => '0644',
-            'content' => <<-END.gsub(/^[[:blank:]]{14}/, '')
+            'content' => <<-END.gsub(%r{^[[:blank:]]{14}}, ''),
               ########################################################################
               #             WARNING: This file is managed by Puppet.                 #
               #               Manual changes will be overwritten.                    #
@@ -129,13 +129,19 @@ describe 'pam_pkcs11::pkcs11_eventmgr', :type => :class do
         context 'to `true`' do
           let(:params) { { 'debug' => true } }
 
-          it { is_expected.to contain_file('pkcs11_eventmgr.conf').with_content(/  debug = true;/) }
+          it {
+            is_expected.to contain_file('pkcs11_eventmgr.conf')
+              .with_content(%r{  debug = true;})
+          }
         end
 
         context 'to `false`' do
           let(:params) { { 'debug' => false } }
 
-          it { is_expected.to contain_file('pkcs11_eventmgr.conf').with_content(/  debug = false;/) }
+          it {
+            is_expected.to contain_file('pkcs11_eventmgr.conf')
+              .with_content(%r{  debug = false;})
+          }
         end
       end
 
@@ -143,49 +149,65 @@ describe 'pam_pkcs11::pkcs11_eventmgr', :type => :class do
         context 'to `true`' do
           let(:params) { { 'daemonize' => true } }
 
-          it { is_expected.to contain_file('pkcs11_eventmgr.conf').with_content(/  daemon = true;/) }
+          it {
+            is_expected.to contain_file('pkcs11_eventmgr.conf')
+              .with_content(%r{  daemon = true;})
+          }
         end
 
         context 'to `false`' do
           let(:params) { { 'daemonize' => false } }
 
-          it { is_expected.to contain_file('pkcs11_eventmgr.conf').with_content(/  daemon = false;/) }
+          it {
+            is_expected.to contain_file('pkcs11_eventmgr.conf')
+              .with_content(%r{  daemon = false;})
+          }
         end
       end
 
       context 'when `polling_time` is set' do
         context 'to a valid, non-default Number' do
           let(:params) { { 'polling_time' => 120 } }
-          it { is_expected.to contain_file('pkcs11_eventmgr.conf').with_content(/  polling_time = 120;/) }
+
+          it {
+            is_expected.to contain_file('pkcs11_eventmgr.conf')
+              .with_content(%r{  polling_time = 120;})
+          }
         end
 
-        context 'to a vaid Number passed as a String' do
+        context 'to a valid Number passed as a String' do
           let(:params) { { 'polling_time' => '90' } }
-          it { is_expected.to contain_file('pkcs11_eventmgr.conf').with_content(/  polling_time = 90;/) }
+
+          it { is_expected.to raise_error(Puppet::Error) }
         end
 
         context 'to an a non-numeric String' do
           let(:params) { { 'polling_time' => 'one' } }
+
           it { is_expected.to raise_error(Puppet::Error) }
         end
 
         context 'to an a Boolean that is true' do
           let(:params) { { 'polling_time' => true } }
+
           it { is_expected.to raise_error(Puppet::Error) }
         end
 
         context 'to an a Boolean that is false' do
           let(:params) { { 'polling_time' => false } }
+
           it { is_expected.to raise_error(Puppet::Error) }
         end
 
         context 'to an an Array' do
           let(:params) { { 'polling_time' => [1] } }
+
           it { is_expected.to raise_error(Puppet::Error) }
         end
 
         context 'to an a Hash' do
           let(:params) { { 'polling_time' => { 1 => 1 } } }
+
           it { is_expected.to raise_error(Puppet::Error) }
         end
       end
@@ -193,36 +215,46 @@ describe 'pam_pkcs11::pkcs11_eventmgr', :type => :class do
       context 'when `expire_time` is set' do
         context 'to a valid, non-default Number' do
           let(:params) { { 'expire_time' => 120 } }
-          it { is_expected.to contain_file('pkcs11_eventmgr.conf').with_content(/  expire_time = 120;/) }
+
+          it {
+            is_expected.to contain_file('pkcs11_eventmgr.conf')
+              .with_content(%r{  expire_time = 120;})
+          }
         end
 
-        context 'to a vaid Number passed as a String' do
+        context 'to a valid Number passed as a String' do
           let(:params) { { 'expire_time' => '90' } }
-          it { is_expected.to contain_file('pkcs11_eventmgr.conf').with_content(/  expire_time = 90;/) }
+
+          it { is_expected.to raise_error(Puppet::Error) }
         end
 
         context 'to an a non-numeric String' do
           let(:params) { { 'expire_time' => 'one' } }
+
           it { is_expected.to raise_error(Puppet::Error) }
         end
 
         context 'to an a Boolean that is true' do
           let(:params) { { 'expire_time' => true } }
+
           it { is_expected.to raise_error(Puppet::Error) }
         end
 
         context 'to an a Boolean that is false' do
           let(:params) { { 'expire_time' => false } }
+
           it { is_expected.to raise_error(Puppet::Error) }
         end
 
         context 'to an an Array' do
           let(:params) { { 'expire_time' => [1] } }
+
           it { is_expected.to raise_error(Puppet::Error) }
         end
 
         context 'to an a Hash' do
           let(:params) { { 'expire_time' => { 1 => 1 } } }
+
           it { is_expected.to raise_error(Puppet::Error) }
         end
       end
@@ -230,47 +262,55 @@ describe 'pam_pkcs11::pkcs11_eventmgr', :type => :class do
       context 'when `pkcs11_module` is set' do
         context 'to `default`' do
           let(:params) { { 'pkcs11_module' => 'default' } }
+
           it do
-            is_expected.to contain_file('pkcs11_eventmgr.conf').
-              with_content(/  pkcs11_module = "#{default_module_path}";/)
+            is_expected.to contain_file('pkcs11_eventmgr.conf')
+              .with_content(%r{  pkcs11_module = "#{default_module_path}";})
           end
         end
 
         context 'to a fully qualified path' do
           let(:params) { { 'pkcs11_module' => '/usr/local/lib/pkcs11/opensc-pkcs11.so' } }
+
           it do
-            is_expected.to contain_file('pkcs11_eventmgr.conf').
-              with_content(/  pkcs11_module = "\/usr\/local\/lib\/pkcs11\/opensc-pkcs11\.so";/)
+            is_expected.to contain_file('pkcs11_eventmgr.conf')
+              .with_content(%r{  pkcs11_module = "/usr/local/lib/pkcs11/opensc-pkcs11\.so";})
           end
         end
 
         context 'to an invalid String' do
           let(:params) { { 'pkcs11_module' => 'opensc-pkcs11\.so' } }
+
           it { is_expected.to raise_error(Puppet::Error) }
         end
 
         context 'to an a Boolean that is true' do
           let(:params) { { 'pkcs11_module' => true } }
+
           it { is_expected.to raise_error(Puppet::Error) }
         end
 
         context 'to an a Boolean that is false' do
           let(:params) { { 'pkcs11_module' => false } }
+
           it { is_expected.to raise_error(Puppet::Error) }
         end
 
         context 'to a Number' do
           let(:params) { { 'pkcs11_module' => 1 } }
+
           it { is_expected.to raise_error(Puppet::Error) }
         end
 
         context 'to an an Array' do
           let(:params) { { 'pkcs11_module' => ['/usr/local/lib/pkcs11/opensc-pkcs11.so'] } }
+
           it { is_expected.to raise_error(Puppet::Error) }
         end
 
         context 'to an a Hash' do
           let(:params) { { 'pkcs11_module' => { 1 => 1 } } }
+
           it { is_expected.to raise_error(Puppet::Error) }
         end
       end
@@ -298,7 +338,7 @@ describe 'pam_pkcs11::pkcs11_eventmgr', :type => :class do
 
           it do
             is_expected.to contain_file('pkcs11_eventmgr.conf').with_content(
-              <<-END.gsub(/^[[:blank:]]{16}/, '')
+              <<-END.gsub(%r{^[[:blank:]]{16}}, ''),
                 ########################################################################
                 #             WARNING: This file is managed by Puppet.                 #
                 #               Manual changes will be overwritten.                    #
@@ -332,21 +372,25 @@ describe 'pam_pkcs11::pkcs11_eventmgr', :type => :class do
 
         context 'to an a Boolean that is true' do
           let(:params) { { 'event_opts' => true } }
+
           it { is_expected.to raise_error(Puppet::Error) }
         end
 
         context 'to an a Boolean that is false' do
           let(:params) { { 'event_opts' => false } }
+
           it { is_expected.to raise_error(Puppet::Error) }
         end
 
         context 'to a Number' do
           let(:params) { { 'event_opts' => 1 } }
+
           it { is_expected.to raise_error(Puppet::Error) }
         end
 
         context 'to an a String' do
           let(:params) { { 'event_opts' => 'options!' } }
+
           it { is_expected.to raise_error(Puppet::Error) }
         end
 
@@ -354,12 +398,13 @@ describe 'pam_pkcs11::pkcs11_eventmgr', :type => :class do
           let(:params) do
             {
               'event_opts' => [
-                ['card_insert', %w(on_error ignore), ['action', ['/bin/true']]],
-                ['card_remove', %w(on_error ignore), ['action', ['/bin/true']]],
-                ['expire_time', %w(on_error ignore), ['action', ['/bin/true']]],
+                ['card_insert', ['on_error ignore'], ['action', ['/bin/true']]],
+                ['card_remove', ['on_error ignore'], ['action', ['/bin/true']]],
+                ['expire_time', ['on_error ignore'], ['action', ['/bin/true']]],
               ],
             }
           end
+
           it { is_expected.to raise_error(Puppet::Error) }
         end
       end
@@ -367,7 +412,7 @@ describe 'pam_pkcs11::pkcs11_eventmgr', :type => :class do
       context 'when autostart_method is set' do
         context 'to systemd_service' do
           let(:params) do
-            { :autostart_method => 'systemd_service' }
+            { autostart_method: 'systemd_service' }
           end
 
           it { is_expected.not_to contain_file('pkcs11_eventmgr.desktop') }
@@ -378,7 +423,7 @@ describe 'pam_pkcs11::pkcs11_eventmgr', :type => :class do
               'owner'   => 'root',
               'group'   => 'root',
               'mode'    => '0644',
-              'content' => <<-END.gsub(/^[[:blank:]]{16}/, '')
+              'content' => <<-END.gsub(%r{^[[:blank:]]{16}}, ''),
                 [Unit]
                 Description=SmartCard PKCS#11 Event Manager
                 Documentation=man:pkcs11_eventmgr(1)
@@ -395,7 +440,7 @@ describe 'pam_pkcs11::pkcs11_eventmgr', :type => :class do
 
         context 'to xdg_autostart' do
           let(:params) do
-            { :autostart_method => 'xdg_autostart' }
+            { autostart_method: 'xdg_autostart' }
           end
 
           it { is_expected.not_to contain_file('pkcs11_eventmgr.service') }
@@ -406,7 +451,7 @@ describe 'pam_pkcs11::pkcs11_eventmgr', :type => :class do
               'owner'   => 'root',
               'group'   => 'root',
               'mode'    => '0644',
-              'content' => <<-END.gsub(/^[[:blank:]]{16}/, '')
+              'content' => <<-END.gsub(%r{^[[:blank:]]{16}}, ''),
                 [Desktop Entry]
                 Version=1.0
                 Type=Application
@@ -419,7 +464,7 @@ describe 'pam_pkcs11::pkcs11_eventmgr', :type => :class do
 
         context 'to none' do
           let(:params) do
-            { :autostart_method => 'none' }
+            { autostart_method: 'none' }
           end
 
           it { is_expected.not_to contain_file('pkcs11_eventmgr.service') }
@@ -428,21 +473,20 @@ describe 'pam_pkcs11::pkcs11_eventmgr', :type => :class do
 
         context 'to an invalid value' do
           let(:params) do
-            { :autostart_method => 'invalid string' }
+            { autostart_method: 'invalid string' }
           end
 
-          it { is_expected.to raise_error(Puppet::Error, /does not match/) }
+          it { is_expected.to raise_error(Puppet::Error, %r{Evaluation Error}) }
         end
 
         context 'to an invalid type' do
           let(:params) do
-            { :autostart_method => false }
+            { autostart_method: false }
           end
 
-          it { is_expected.to raise_error(Puppet::Error, /is not a string/) }
+          it { is_expected.to raise_error(Puppet::Error, %r{Evaluation Error}) }
         end
       end
     end
   end # on_supported_os
 end
-# vim:foldmethod=syntax

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'pam_pkcs11::install', :type => :class do
+describe 'pam_pkcs11::install', type: :class do
   on_supported_os.each do |os, facts|
     context "on #{os}" do
       let(:facts) do
@@ -8,7 +8,7 @@ describe 'pam_pkcs11::install', :type => :class do
       end
 
       let(:package_name) do
-        case facts[:osfamily]
+        case facts[:os]['family']
         when 'Gentoo'
           'sys-auth/pam_pkcs11'
         when 'Debian'
@@ -21,18 +21,6 @@ describe 'pam_pkcs11::install', :type => :class do
       context 'without any parameters' do
         it { is_expected.to contain_package(package_name).with_ensure('present') }
       end
-    end
-  end
-
-  context 'on an unsupported operating system' do
-    let(:facts) do
-      {
-        :osfamily => 'Solaris',
-        :operatingsystem => 'Nexenta',
-      }
-    end
-
-    context 'without any parameters' do
     end
   end
 end

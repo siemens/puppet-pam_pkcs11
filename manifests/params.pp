@@ -1,10 +1,10 @@
 # == Class pam_pkcs11::params
 #
-# This class is meant to be called from pam_pkcs11.
-# It sets variables according to platform.
+# @summary This class is meant to be called from pam_pkcs11.
+#   It sets variables according to platform.
 #
 class pam_pkcs11::params {
-  case $::osfamily {
+  case $facts['os']['family'] {
     'Gentoo': {
       # Gentoo uses version 0.6.8
       $package_name       = 'sys-auth/pam_pkcs11'
@@ -29,26 +29,27 @@ class pam_pkcs11::params {
       $nss_dir            = undef
       $cert_policy        = ['signature', 'ca', 'crl_auto']
 
-      case $::operatingsystem {
+      case $facts['os']['name'] {
         'Debian': {
-          $systemd = $::operatingsystemmajrelease ? {
+          $systemd = $facts['os']['release']['major'] ? {
             '8'     => true,
             default => false,
           }
         }
         'Ubuntu': {
-          $systemd = $::operatingsystemmajrelease ? {
+          $systemd = $facts['os']['release']['major'] ? {
             '16.04' => true,
             default => false,
           }
         }
+        default: { fail("${facts['os']['name']} not supported") }
       }
     }
     'RedHat', 'Suse': {
       # RHEL 5 uses version 0.5.3
       # RHEL 6 uses version 0.6.2
       # RHEL 7 uses version 0.6.2
-      $lib = $::architecture ? {
+      $lib = $facts['os']['architecture'] ? {
         /i[3-6]86/ => 'lib',
         default    => 'lib64',
       }
@@ -59,18 +60,18 @@ class pam_pkcs11::params {
       $ca_dir             = undef
       $nss_dir            = '/etc/pki/nssdb'
 
-      if $::operatingsystem =~ /RedHat|CentOS|Scientific|OracleLinux/ {
-        $cert_policy = $::operatingsystemmajrelease ? {
+      if $facts['os']['name'] =~ /RedHat|CentOS|Scientific|OracleLinux/ {
+        $cert_policy = $facts['os']['release']['major'] ? {
           '5'     => ['signature', 'ca', 'crl_auto'],
           default => ['signature', 'ca', 'crl_auto', 'ocsp_on'],
         }
-        $systemd = $::operatingsystemmajrelease ? {
+        $systemd = $facts['os']['release']['major'] ? {
           '7'     => true,
           default => false,
         }
-      } elsif $::osfamily == 'Suse' {
+      } elsif $facts['os']['family'] == 'Suse' {
         $cert_policy = ['signature', 'ca', 'crl_auto', 'ocsp_on']
-        $systemd = $::operatingsystemmajrelease ? {
+        $systemd = $facts['os']['release']['major'] ? {
           '11'    => false,
           default => true,
         }
@@ -79,7 +80,7 @@ class pam_pkcs11::params {
         $systemd = true
       }
     }
-    default: { fail("${::operatingsystem} not supported") }
+    default: { fail("${facts['os']['name']} not supported") }
   }
 
   $pkcs11_eventmgr_autostart_method = $systemd ? {
@@ -101,7 +102,7 @@ class pam_pkcs11::params {
   }
 
   $mapper_options = {
-    'digest' =>  {
+    'digest' => {
       'debug'     => false,
       'module'    => 'internal',
       'algorithm' => 'sha1',
