@@ -9,7 +9,24 @@ describe 'pam_pkcs11' do
     os_files_path = 'Gentoo'
   when 'Debian'
     package_name = 'libpam-pkcs11'
-    os_files_path = 'Debian'
+    os_files_path = case fact('os')['name']
+                    when 'Debian'
+                      case fact('os')['release']['major']
+                      when '7', '8'
+                        'Debian-old'
+                      else
+                        'Debian'
+                      end
+                    when 'Ubuntu'
+                      case fact('os')['release']['major']
+                      when '12.04', '14.04'
+                        'Debian-old'
+                      else
+                        'Debian'
+                      end
+                    else
+                      'invalid-acceptance-init-spec'
+                    end
   when 'RedHat', 'Suse'
     package_name = 'pam_pkcs11'
     os_files_path = if fact('os')['architecture'].match?(%r{i[3-6]86})

@@ -24,12 +24,6 @@ pam_pkcs11 {
 <% end -%>
   }
 
-<% @use_mappers.each do |mapper| -%>
-<%   if ! mapper.is_a?(String) then raise Puppet::Error.new("#{v} is not a string.") end -%>
-<%   if mapper !~ /^(?:generic|subject|openssh|opensc|pwent|null|ldap|cn|mail|ms|krb|uid|digest)$/ -%>
-<%     raise Puppet::Error.new("#{mapper} does not match '^(?:generic|subject|openssh|opensc|pwent|null|ldap|cn|mail|ms|krb|uid|digest)$'") -%>
-<%   end -%>
-<% end -%>
   use_mappers = "<%= @use_mappers.join(', ') -%>";
 
 <% @merged_mapper_options.keys.sort.each do |mapper_name| -%>

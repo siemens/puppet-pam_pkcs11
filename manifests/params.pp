@@ -16,30 +16,58 @@ class pam_pkcs11::params {
       $systemd            = false # by default
     } # end osfamily Gentoo
     'Debian': {
-      # Debian 7 uses version 6.8
-      # Debian 8 uses version 6.8
-      # Debian 9 uses version 6.8
-      # Ubuntu 12.04 uses version 6.7
-      # Ubuntu 14.04 uses version 6.8
-      # Ubuntu 16.04 uses version 6.8
+      # Debian 7 uses version 0.6.8
+      # Debian 8 uses version 0.6.8
+      # Debian 9 uses version 0.6.9
+      # Debian 10 uses version 0.6.9
+      # Debian 11 uses version 0.6.11
+      # Ubuntu 12.04 uses version 0.6.7
+      # Ubuntu 14.04 uses version 0.6.8
+      # Ubuntu 16.04 uses version 0.6.8
+      # Ubuntu 18.04 uses version 0.6.9
+      # Ubuntu 20.04 uses version 0.6.11
       $package_name       = 'libpam-pkcs11'
-      $opensc_module_path = '/usr/lib/opensc-pkcs11.so'
       $mapper_module_dir  = '/lib/pam_pkcs11'
       $ca_dir             = '/etc/pam_pkcs11/cacerts'
       $nss_dir            = undef
       $cert_policy        = ['signature', 'ca', 'crl_auto']
 
+      $gcc_arch = $facts['os']['architecture'] ? {
+        'amd64' => 'x86_64',
+        default  => $facts['os']['architecture']
+      }
+
+      $module_path_old = '/usr/lib/opensc-pkcs11.so'
+      $module_path_new = "/usr/lib/${gcc_arch}-linux-gnu/pkcs11/opensc-pkcs11.so"
+
       case $facts['os']['name'] {
         'Debian': {
           $systemd = $facts['os']['release']['major'] ? {
-            '8'     => true,
-            default => false,
+            '7'     => false,
+            default => true,
+          }
+          $opensc_module_path = $facts['os']['release']['major'] ? {
+            '7' => $module_path_old,
+            '8' => $module_path_old,
+            '9' => $module_path_new,
+            '10' => $module_path_new,
+            '11' => $module_path_new,
+            default => fail("${facts['os']['release']['major']} of ${facts['os']['name']} not supported")
           }
         }
         'Ubuntu': {
           $systemd = $facts['os']['release']['major'] ? {
-            '16.04' => true,
-            default => false,
+            '12.04' => false,
+            '14.04' => false,
+            default => true,
+          }
+          $opensc_module_path = $facts['os']['release']['major'] ? {
+            '12.04' => $module_path_old,
+            '14.04' => $module_path_old,
+            '16.04' => $module_path_new,
+            '18.04' => $module_path_new,
+            '20.04' => $module_path_new,
+            default => fail("${facts['os']['release']['major']} of ${facts['os']['name']} not supported")
           }
         }
         default: { fail("${facts['os']['name']} not supported") }
