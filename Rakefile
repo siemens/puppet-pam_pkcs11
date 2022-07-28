@@ -88,3 +88,4 @@ EOM
   end
 end
 
+import 'Rakefile.local'

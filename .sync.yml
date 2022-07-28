@@ -13,6 +13,8 @@ appveyor.yml:
 .gitlab-ci.yml:
   delete: true
 Rakefile:
+  extras:
+    - "import 'Rakefile.local'"
   linter_fail_on_warnings: true
 Gemfile:
   required:
@@ -22,3 +24,6 @@ Gemfile:
     ':integration':
       - gem: beaker
         version: "~> 4.37.1"
+      - gem: beaker-rspec
+      - gem: beaker-vagrant
+        #- gem: beaker-puppet

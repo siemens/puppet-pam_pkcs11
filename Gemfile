@@ -33,6 +33,8 @@ group :system_tests do
 end
 group :integration do
   gem "beaker", '~> 4.37.1', require: false
+  gem "beaker-rspec",        require: false
+  gem "beaker-vagrant",      require: false
 end
 
 puppet_version = ENV['PUPPET_GEM_VERSION']
