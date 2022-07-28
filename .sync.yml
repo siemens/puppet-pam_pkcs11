@@ -19,3 +19,6 @@ Gemfile:
     ':development':
       - gem: pdk
         version: "~> 2.5.0"
+    ':integration':
+      - gem: beaker
+        version: "~> 4.37.1"
