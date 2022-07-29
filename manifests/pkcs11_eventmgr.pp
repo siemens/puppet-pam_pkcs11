@@ -116,19 +116,16 @@ class pam_pkcs11::pkcs11_eventmgr (
     mode   => '0644',
   }
 
-  file { 'pkcs11_eventmgr.conf':
-    path    => '/etc/pam_pkcs11/pkcs11_eventmgr.conf',
+  file { '/etc/pam_pkcs11/pkcs11_eventmgr.conf':
     content => template('pam_pkcs11/pkcs11_eventmgr.conf.erb'),
   }
 
   if $autostart_method == 'systemd_service' {
-    file { 'pkcs11_eventmgr.service':
-      path    => '/etc/systemd/user/pkcs11_eventmgr.service',
+    file { '/etc/systemd/user/pkcs11_eventmgr.service':
       content => template('pam_pkcs11/pkcs11_eventmgr.service.erb'),
     }
   } elsif $autostart_method == 'xdg_autostart' {
-    file { 'pkcs11_eventmgr.desktop':
-      path    => '/etc/xdg/autostart/pkcs11_eventmgr.desktop',
+    file { '/etc/xdg/autostart/pkcs11_eventmgr.desktop':
       content => template('pam_pkcs11/pkcs11_eventmgr.desktop.erb'),
     }
   }

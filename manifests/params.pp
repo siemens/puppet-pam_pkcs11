@@ -14,6 +14,7 @@ class pam_pkcs11::params {
       $nss_dir            = '/etc/pki/nssdb'
       $cert_policy        = ['signature', 'ca', 'crl_auto', 'ocsp_on']
       $systemd            = false # by default
+      $pam_config         = 'none'
     } # end osfamily Gentoo
     'Debian': {
       # Debian 7 uses version 0.6.8
@@ -31,6 +32,7 @@ class pam_pkcs11::params {
       $ca_dir             = '/etc/pam_pkcs11/cacerts'
       $nss_dir            = undef
       $cert_policy        = ['signature', 'ca', 'crl_auto']
+      $pam_config         = 'pam-auth-update'
 
       $gcc_arch = $facts['os']['architecture'] ? {
         'amd64' => 'x86_64',
@@ -87,6 +89,7 @@ class pam_pkcs11::params {
       $mapper_module_dir  = "/usr/${lib}/pam_pkcs11"
       $ca_dir             = undef
       $nss_dir            = '/etc/pki/nssdb'
+      $pam_config         = 'none'
 
       if $facts['os']['name'] =~ /RedHat|CentOS|Scientific|OracleLinux/ {
         $cert_policy = $facts['os']['release']['major'] ? {

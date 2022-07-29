@@ -15,31 +15,27 @@ class pam_pkcs11::config inherits pam_pkcs11 {
     mode   => '0755',
   }
 
-  file { 'pam_pkcs11.conf':
+  file { '/etc/pam_pkcs11/pam_pkcs11.conf':
     ensure  => file,
-    path    => '/etc/pam_pkcs11/pam_pkcs11.conf',
     mode    => '0600',
     content => template('pam_pkcs11/pam_pkcs11.conf.erb'),
   }
 
   # TODO: Mappings should really be a custom type so they can be collected.
-  file { 'digest_mapping':
+  file { '/etc/pam_pkcs11/digest_mapping':
     ensure  => file,
-    path    => '/etc/pam_pkcs11/digest_mapping',
     mode    => '0600',
     content => template('pam_pkcs11/digest_mapping.erb'),
   }
 
-  file { 'subject_mapping':
+  file { '/etc/pam_pkcs11/subject_mapping':
     ensure  => file,
-    path    => '/etc/pam_pkcs11/subject_mapping',
     mode    => '0600',
     content => template('pam_pkcs11/subject_mapping.erb'),
   }
 
-  file { 'uid_mapping':
+  file { '/etc/pam_pkcs11/uid_mapping':
     ensure  => file,
-    path    => '/etc/pam_pkcs11/uid_mapping',
     mode    => '0600',
     content => template('pam_pkcs11/uid_mapping.erb'),
   }
@@ -63,6 +59,25 @@ class pam_pkcs11::config inherits pam_pkcs11 {
       refreshonly => true,
       cwd         => $pam_pkcs11::merged_pkcs11_module['ca_dir'],
       path        => ['/usr/local/bin', '/usr/local/sbin', '/usr/bin', '/usr/sbin', '/bin', '/sbin'],
+    }
+  }
+
+  if $pam_pkcs11::pam_config == 'pam-auth-update' {
+    file { '/usr/share/pam-configs':
+      ensure => directory,
+      mode   => '0755',
+    }
+
+    file { '/usr/share/pam-configs/pkcs11':
+      ensure  => file,
+      mode    => '0644',
+      content => template('pam_pkcs11/pam-config.erb'),
+    }
+
+    exec { 'pam-auth-update':
+      path        => ['/usr/local/sbin', '/usr/local/bin', '/usr/sbin', '/usr/bin', '/sbin', '/bin'],
+      subscribe   => File['/usr/share/pam-configs/pkcs11'],
+      refreshonly => true,
     }
   }
 }

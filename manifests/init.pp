@@ -204,6 +204,14 @@
 #
 #   Default: true
 #
+# @param pam_config
+#   String
+#
+#   What pam auth configuration framework is used.  Currently only supports
+#   `pam-auth-update` or `none`.
+#
+#   Default: $pam_pkcs11::params::pam_config
+#
 class pam_pkcs11 (
   String                       $package_name           = $pam_pkcs11::params::package_name,
   Boolean                      $debug                  = false,
@@ -249,6 +257,9 @@ class pam_pkcs11 (
     'first',
   'all']                       $ca_dir_sourceselect    = 'first',
   Boolean                      $manage_pkcs11_eventmgr = true,
+  Enum[
+    'pam-auth-update',
+  'none']                      $pam_config             = $pam_pkcs11::params::pam_config,
 ) inherits pam_pkcs11::params {
   if $ca_dir_source != [] and $facts['os']['family'] == 'RedHat' { fail('The `ca_dir_source` parameter is not supported on RedHat OS families.') }
 

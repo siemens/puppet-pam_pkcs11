@@ -39,6 +39,10 @@ describe 'pam_pkcs11' do
   default_pam_pkcs11_conf = File.open(File.join(fixture_path, 'default_files', os_files_path, 'pam_pkcs11.conf')).read
   default_pkcs11_eventmgr_conf = File.open(File.join(fixture_path, 'default_files', os_files_path, 'pkcs11_eventmgr.conf')).read
 
+  if fact('os')['family'] == 'Debian'
+    default_pam_config_pkcs11 = File.open(File.join(fixture_path, 'default_files', os_files_path, 'pam-config.conf')).read
+  end
+
   context 'with default parameters' do
     it 'must work idempotently with no errors' do
       manifest = <<-END
@@ -74,6 +78,23 @@ describe 'pam_pkcs11' do
       it { is_expected.to be_grouped_into 'root' }
       it { is_expected.to be_mode '644' }
       its(:content) { is_expected.to match(default_pkcs11_eventmgr_conf) }
+    end
+
+    if fact('os')['family'] == 'Debian'
+      describe file('/usr/share/pam-configs') do
+        it { is_expected.to be_directory }
+        it { is_expected.to be_owned_by 'root' }
+        it { is_expected.to be_grouped_into 'root' }
+        it { is_expected.to be_mode '755' }
+      end
+
+      describe file('/usr/share/pam-configs/pkcs11') do
+        it { is_expected.to be_file }
+        it { is_expected.to be_owned_by 'root' }
+        it { is_expected.to be_grouped_into 'root' }
+        it { is_expected.to be_mode '644' }
+        its(:content) { is_expected.to match(default_pam_config_pkcs11) }
+      end
     end
   end
 
