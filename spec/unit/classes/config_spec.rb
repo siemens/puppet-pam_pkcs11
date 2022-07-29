@@ -59,13 +59,12 @@ describe 'pam_pkcs11::config', type: :class do
         end
 
         it do
-          is_expected.to contain_file('pam_pkcs11.conf')
+          is_expected.to contain_file('/etc/pam_pkcs11/pam_pkcs11.conf')
             .with(
               'ensure' => 'file',
               'owner'  => 'root',
               'group'  => 'root',
               'mode'   => '0600',
-              'path'   => '/etc/pam_pkcs11/pam_pkcs11.conf',
             )
             .with_content(default_pam_pkcs11_conf)
             .that_requires('File[/etc/pam_pkcs11]')

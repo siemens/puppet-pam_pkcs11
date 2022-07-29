@@ -15,31 +15,27 @@ class pam_pkcs11::config inherits pam_pkcs11 {
     mode   => '0755',
   }
 
-  file { 'pam_pkcs11.conf':
+  file { '/etc/pam_pkcs11/pam_pkcs11.conf':
     ensure  => file,
-    path    => '/etc/pam_pkcs11/pam_pkcs11.conf',
     mode    => '0600',
     content => template('pam_pkcs11/pam_pkcs11.conf.erb'),
   }
 
   # TODO: Mappings should really be a custom type so they can be collected.
-  file { 'digest_mapping':
+  file { '/etc/pam_pkcs11/digest_mapping':
     ensure  => file,
-    path    => '/etc/pam_pkcs11/digest_mapping',
     mode    => '0600',
     content => template('pam_pkcs11/digest_mapping.erb'),
   }
 
-  file { 'subject_mapping':
+  file { '/etc/pam_pkcs11/subject_mapping':
     ensure  => file,
-    path    => '/etc/pam_pkcs11/subject_mapping',
     mode    => '0600',
     content => template('pam_pkcs11/subject_mapping.erb'),
   }
 
-  file { 'uid_mapping':
+  file { '/etc/pam_pkcs11/uid_mapping':
     ensure  => file,
-    path    => '/etc/pam_pkcs11/uid_mapping',
     mode    => '0600',
     content => template('pam_pkcs11/uid_mapping.erb'),
   }

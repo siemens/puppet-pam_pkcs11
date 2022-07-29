@@ -89,13 +89,12 @@ describe 'pam_pkcs11', type: :class do
         end
 
         it do
-          is_expected.to contain_file('pam_pkcs11.conf')
+          is_expected.to contain_file('/etc/pam_pkcs11/pam_pkcs11.conf')
             .with(
               'ensure' => 'file',
               'owner'  => 'root',
               'group'  => 'root',
               'mode'   => '0600',
-              'path'   => '/etc/pam_pkcs11/pam_pkcs11.conf',
             )
             .with_content(default_pam_pkcs11_conf)
             .that_requires('File[/etc/pam_pkcs11]')
@@ -105,9 +104,8 @@ describe 'pam_pkcs11', type: :class do
         # pam_pkcs11::pkcs11_eventmgr
         #
         it do
-          is_expected.to contain_file('pkcs11_eventmgr.conf').with(
+          is_expected.to contain_file('/etc/pam_pkcs11/pkcs11_eventmgr.conf').with(
             'ensure'  => 'present',
-            'path'    => '/etc/pam_pkcs11/pkcs11_eventmgr.conf',
             'owner'   => 'root',
             'group'   => 'root',
             'mode'    => '0644',
@@ -122,7 +120,7 @@ describe 'pam_pkcs11', type: :class do
 
           # FIXME: `debug` appears multiple times in the file
           it {
-            is_expected.to contain_file('pam_pkcs11.conf')
+            is_expected.to contain_file('/etc/pam_pkcs11/pam_pkcs11.conf')
               .with_content(%r{  debug             = true;})
           }
         end
@@ -132,7 +130,7 @@ describe 'pam_pkcs11', type: :class do
 
           # FIXME: `debug` appears multiple times in the file
           it {
-            is_expected.to contain_file('pam_pkcs11.conf')
+            is_expected.to contain_file('/etc/pam_pkcs11/pam_pkcs11.conf')
               .with_content(%r{  debug             = false;})
           }
         end
@@ -143,7 +141,7 @@ describe 'pam_pkcs11', type: :class do
           let(:params) { { 'nullok' => true } }
 
           it {
-            is_expected.to contain_file('pam_pkcs11.conf')
+            is_expected.to contain_file('/etc/pam_pkcs11/pam_pkcs11.conf')
               .with_content(%r{  nullok            = true;})
           }
         end
@@ -152,7 +150,7 @@ describe 'pam_pkcs11', type: :class do
           let(:params) { { 'debug' => false } }
 
           it {
-            is_expected.to contain_file('pam_pkcs11.conf')
+            is_expected.to contain_file('/etc/pam_pkcs11/pam_pkcs11.conf')
               .with_content(%r{  nullok            = false;})
           }
         end
@@ -163,7 +161,7 @@ describe 'pam_pkcs11', type: :class do
           let(:params) { { 'use_first_pass' => true } }
 
           it {
-            is_expected.to contain_file('pam_pkcs11.conf')
+            is_expected.to contain_file('/etc/pam_pkcs11/pam_pkcs11.conf')
               .with_content(%r{  use_first_pass    = true;})
           }
         end
@@ -172,7 +170,7 @@ describe 'pam_pkcs11', type: :class do
           let(:params) { { 'debug' => false } }
 
           it {
-            is_expected.to contain_file('pam_pkcs11.conf')
+            is_expected.to contain_file('/etc/pam_pkcs11/pam_pkcs11.conf')
               .with_content(%r{  use_first_pass    = false;})
           }
         end
@@ -183,7 +181,7 @@ describe 'pam_pkcs11', type: :class do
           let(:params) { { 'try_first_pass' => true } }
 
           it {
-            is_expected.to contain_file('pam_pkcs11.conf')
+            is_expected.to contain_file('/etc/pam_pkcs11/pam_pkcs11.conf')
               .with_content(%r{  try_first_pass    = true;})
           }
         end
@@ -192,7 +190,7 @@ describe 'pam_pkcs11', type: :class do
           let(:params) { { 'debug' => false } }
 
           it {
-            is_expected.to contain_file('pam_pkcs11.conf')
+            is_expected.to contain_file('/etc/pam_pkcs11/pam_pkcs11.conf')
               .with_content(%r{  try_first_pass    = false;})
           }
         end
@@ -203,7 +201,7 @@ describe 'pam_pkcs11', type: :class do
           let(:params) { { 'use_authtok' => true } }
 
           it {
-            is_expected.to contain_file('pam_pkcs11.conf')
+            is_expected.to contain_file('/etc/pam_pkcs11/pam_pkcs11.conf')
               .with_content(%r{  use_authtok       = true;})
           }
         end
@@ -212,7 +210,7 @@ describe 'pam_pkcs11', type: :class do
           let(:params) { { 'debug' => false } }
 
           it {
-            is_expected.to contain_file('pam_pkcs11.conf')
+            is_expected.to contain_file('/etc/pam_pkcs11/pam_pkcs11.conf')
               .with_content(%r{  use_authtok       = false;})
           }
         end
@@ -223,7 +221,7 @@ describe 'pam_pkcs11', type: :class do
           let(:params) { { 'card_only' => true } }
 
           it {
-            is_expected.to contain_file('pam_pkcs11.conf')
+            is_expected.to contain_file('/etc/pam_pkcs11/pam_pkcs11.conf')
               .with_content(%r{  card_only         = true;})
           }
         end
@@ -232,7 +230,7 @@ describe 'pam_pkcs11', type: :class do
           let(:params) { { 'debug' => false } }
 
           it {
-            is_expected.to contain_file('pam_pkcs11.conf')
+            is_expected.to contain_file('/etc/pam_pkcs11/pam_pkcs11.conf')
               .with_content(%r{  card_only         = false;})
           }
         end
@@ -243,7 +241,7 @@ describe 'pam_pkcs11', type: :class do
           let(:params) { { 'wait_for_card' => true } }
 
           it {
-            is_expected.to contain_file('pam_pkcs11.conf')
+            is_expected.to contain_file('/etc/pam_pkcs11/pam_pkcs11.conf')
               .with_content(%r{  wait_for_card     = true;})
           }
         end
@@ -252,7 +250,7 @@ describe 'pam_pkcs11', type: :class do
           let(:params) { { 'debug' => false } }
 
           it {
-            is_expected.to contain_file('pam_pkcs11.conf')
+            is_expected.to contain_file('/etc/pam_pkcs11/pam_pkcs11.conf')
               .with_content(%r{  wait_for_card     = false;})
           }
         end
@@ -263,7 +261,7 @@ describe 'pam_pkcs11', type: :class do
           let(:params) { { 'use_mappers' => ['digest'] } }
 
           it {
-            is_expected.to contain_file('pam_pkcs11.conf')
+            is_expected.to contain_file('/etc/pam_pkcs11/pam_pkcs11.conf')
               .with_content(%r{use_mappers = "digest";})
           }
         end
@@ -272,7 +270,7 @@ describe 'pam_pkcs11', type: :class do
           let(:params) { { 'use_mappers' => ['ldap', 'digest'] } }
 
           it {
-            is_expected.to contain_file('pam_pkcs11.conf')
+            is_expected.to contain_file('/etc/pam_pkcs11/pam_pkcs11.conf')
               .with_content(%r{use_mappers = "ldap, digest";})
           }
         end
@@ -301,9 +299,8 @@ describe 'pam_pkcs11', type: :class do
         end
 
         it do
-          is_expected.to contain_file('digest_mapping')
+          is_expected.to contain_file('/etc/pam_pkcs11/digest_mapping')
             .with_ensure('file')
-            .with_path('/etc/pam_pkcs11/digest_mapping')
             .with_owner('root')
             .with_group('root')
             .with_mode('0600')
@@ -362,9 +359,8 @@ describe 'pam_pkcs11', type: :class do
         end
 
         it do
-          is_expected.to contain_file('subject_mapping')
+          is_expected.to contain_file('/etc/pam_pkcs11/subject_mapping')
             .with_ensure('file')
-            .with_path('/etc/pam_pkcs11/subject_mapping')
             .with_owner('root')
             .with_group('root')
             .with_mode('0600')
@@ -397,9 +393,8 @@ describe 'pam_pkcs11', type: :class do
         end
 
         it do
-          is_expected.to contain_file('uid_mapping')
+          is_expected.to contain_file('/etc/pam_pkcs11/uid_mapping')
             .with_ensure('file')
-            .with_path('/etc/pam_pkcs11/uid_mapping')
             .with_owner('root')
             .with_group('root')
             .with_mode('0600')

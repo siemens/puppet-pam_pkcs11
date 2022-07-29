@@ -2,11 +2,11 @@ require 'spec_helper'
 
 describe 'pam_pkcs11::pkcs11_eventmgr', type: :class do
   shared_examples_for 'an OS that uses systemd by default' do
-    it { is_expected.to contain_file('pkcs11_eventmgr.service') }
+    it { is_expected.to contain_file('/etc/systemd/user/pkcs11_eventmgr.service') }
   end
 
   shared_examples_for 'an OS that does not use systemd by default' do
-    it { is_expected.not_to contain_file('pkcs11_eventmgr.service') }
+    it { is_expected.not_to contain_file('/etc/systemd/user/pkcs11_eventmgr.service') }
   end
 
   on_supported_os.each do |os, facts|
@@ -102,10 +102,10 @@ describe 'pam_pkcs11::pkcs11_eventmgr', type: :class do
           end
         end
 
-        it { is_expected.not_to contain_file('pkcs11_eventmgr.desktop') }
+        it { is_expected.not_to contain_file('/etc/xdg/autostart/pkcs11_eventmgr.desktop') }
 
         it do
-          is_expected.to contain_file('pkcs11_eventmgr.conf').with(
+          is_expected.to contain_file('/etc/pam_pkcs11/pkcs11_eventmgr.conf').with(
             'ensure'  => 'present',
             'path'    => '/etc/pam_pkcs11/pkcs11_eventmgr.conf',
             'owner'   => 'root',
@@ -153,7 +153,7 @@ describe 'pam_pkcs11::pkcs11_eventmgr', type: :class do
           let(:params) { { 'debug' => true } }
 
           it {
-            is_expected.to contain_file('pkcs11_eventmgr.conf')
+            is_expected.to contain_file('/etc/pam_pkcs11/pkcs11_eventmgr.conf')
               .with_content(%r{  debug = true;})
           }
         end
@@ -162,7 +162,7 @@ describe 'pam_pkcs11::pkcs11_eventmgr', type: :class do
           let(:params) { { 'debug' => false } }
 
           it {
-            is_expected.to contain_file('pkcs11_eventmgr.conf')
+            is_expected.to contain_file('/etc/pam_pkcs11/pkcs11_eventmgr.conf')
               .with_content(%r{  debug = false;})
           }
         end
@@ -173,7 +173,7 @@ describe 'pam_pkcs11::pkcs11_eventmgr', type: :class do
           let(:params) { { 'daemonize' => true } }
 
           it {
-            is_expected.to contain_file('pkcs11_eventmgr.conf')
+            is_expected.to contain_file('/etc/pam_pkcs11/pkcs11_eventmgr.conf')
               .with_content(%r{  daemon = true;})
           }
         end
@@ -182,7 +182,7 @@ describe 'pam_pkcs11::pkcs11_eventmgr', type: :class do
           let(:params) { { 'daemonize' => false } }
 
           it {
-            is_expected.to contain_file('pkcs11_eventmgr.conf')
+            is_expected.to contain_file('/etc/pam_pkcs11/pkcs11_eventmgr.conf')
               .with_content(%r{  daemon = false;})
           }
         end
@@ -193,7 +193,7 @@ describe 'pam_pkcs11::pkcs11_eventmgr', type: :class do
           let(:params) { { 'polling_time' => 120 } }
 
           it {
-            is_expected.to contain_file('pkcs11_eventmgr.conf')
+            is_expected.to contain_file('/etc/pam_pkcs11/pkcs11_eventmgr.conf')
               .with_content(%r{  polling_time = 120;})
           }
         end
@@ -240,7 +240,7 @@ describe 'pam_pkcs11::pkcs11_eventmgr', type: :class do
           let(:params) { { 'expire_time' => 120 } }
 
           it {
-            is_expected.to contain_file('pkcs11_eventmgr.conf')
+            is_expected.to contain_file('/etc/pam_pkcs11/pkcs11_eventmgr.conf')
               .with_content(%r{  expire_time = 120;})
           }
         end
@@ -287,7 +287,7 @@ describe 'pam_pkcs11::pkcs11_eventmgr', type: :class do
           let(:params) { { 'pkcs11_module' => 'default' } }
 
           it do
-            is_expected.to contain_file('pkcs11_eventmgr.conf')
+            is_expected.to contain_file('/etc/pam_pkcs11/pkcs11_eventmgr.conf')
               .with_content(%r{  pkcs11_module = "#{default_module_path}";})
           end
         end
@@ -296,7 +296,7 @@ describe 'pam_pkcs11::pkcs11_eventmgr', type: :class do
           let(:params) { { 'pkcs11_module' => '/usr/local/lib/pkcs11/opensc-pkcs11.so' } }
 
           it do
-            is_expected.to contain_file('pkcs11_eventmgr.conf')
+            is_expected.to contain_file('/etc/pam_pkcs11/pkcs11_eventmgr.conf')
               .with_content(%r{  pkcs11_module = "/usr/local/lib/pkcs11/opensc-pkcs11\.so";})
           end
         end
@@ -360,7 +360,7 @@ describe 'pam_pkcs11::pkcs11_eventmgr', type: :class do
           end
 
           it do
-            is_expected.to contain_file('pkcs11_eventmgr.conf').with_content(
+            is_expected.to contain_file('/etc/pam_pkcs11/pkcs11_eventmgr.conf').with_content(
               <<-END.gsub(%r{^[[:blank:]]{16}}, ''),
                 ########################################################################
                 #             WARNING: This file is managed by Puppet.                 #
@@ -437,7 +437,7 @@ describe 'pam_pkcs11::pkcs11_eventmgr', type: :class do
           let(:params) { { 'lock_screen_on_card_removal' => false } }
 
           it do
-            is_expected.to contain_file('pkcs11_eventmgr.conf').with_content(
+            is_expected.to contain_file('/etc/pam_pkcs11/pkcs11_eventmgr.conf').with_content(
               <<-END.gsub(%r{^[[:blank:]]{16}}, ''),
                 ########################################################################
                 #             WARNING: This file is managed by Puppet.                 #
@@ -477,9 +477,9 @@ describe 'pam_pkcs11::pkcs11_eventmgr', type: :class do
             { autostart_method: 'systemd_service' }
           end
 
-          it { is_expected.not_to contain_file('pkcs11_eventmgr.desktop') }
+          it { is_expected.not_to contain_file('/etc/xdg/autostart/pkcs11_eventmgr.desktop') }
           it do
-            is_expected.to contain_file('pkcs11_eventmgr.service').with(
+            is_expected.to contain_file('/etc/systemd/user/pkcs11_eventmgr.service').with(
               'ensure'  => 'present',
               'path'    => '/etc/systemd/user/pkcs11_eventmgr.service',
               'owner'   => 'root',
@@ -505,9 +505,9 @@ describe 'pam_pkcs11::pkcs11_eventmgr', type: :class do
             { autostart_method: 'xdg_autostart' }
           end
 
-          it { is_expected.not_to contain_file('pkcs11_eventmgr.service') }
+          it { is_expected.not_to contain_file('/etc/systemd/user/pkcs11_eventmgr.service') }
           it do
-            is_expected.to contain_file('pkcs11_eventmgr.desktop').with(
+            is_expected.to contain_file('/etc/xdg/autostart/pkcs11_eventmgr.desktop').with(
               'ensure'  => 'present',
               'path'    => '/etc/xdg/autostart/pkcs11_eventmgr.desktop',
               'owner'   => 'root',
@@ -529,8 +529,8 @@ describe 'pam_pkcs11::pkcs11_eventmgr', type: :class do
             { autostart_method: 'none' }
           end
 
-          it { is_expected.not_to contain_file('pkcs11_eventmgr.service') }
-          it { is_expected.not_to contain_file('pkcs11_eventmgr.desktop') }
+          it { is_expected.not_to contain_file('/etc/systemd/user/pkcs11_eventmgr.service') }
+          it { is_expected.not_to contain_file('/etc/xdg/autostart/pkcs11_eventmgr.desktop') }
         end
 
         context 'to an invalid value' do
