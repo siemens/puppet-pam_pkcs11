@@ -6,12 +6,35 @@
 # See https://github.com/puppetlabs/pdk-templates/blob/main/config_defaults.yml
 # for the default values.
 ---
+common:
+  owner: siemens
+  honeycomb:
+    writekey: "${{ secrets.HONEYCOMB_WRITEKEY }}"
+    dataset: "puppet-pam_pkcs11 litmus tests"
 .travis.yml:
   delete: true
 appveyor.yml:
   delete: true
 .gitlab-ci.yml:
   delete: true
+.github/workflows/nightly.yml:
+  unmanaged: false
+  exclude_platforms:
+    - RedHat-7
+    - SLES-12
+    - SLES-15
+.github/workflows/pr_test.yml:
+  unmanaged: false
+  exclude_platforms:
+    - RedHat-7
+    - SLES-12
+    - SLES-15
+.github/workflows/auto_release.yml:
+  unmanaged: false
+.github/workflows/spec.yml:
+  unmanaged: false
+.github/workflows/release.yml:
+  unmanaged: false
 Rakefile:
   linter_fail_on_warnings: true
 Gemfile:
@@ -19,3 +42,9 @@ Gemfile:
     ':development':
       - gem: pdk
         version: "~> 2.5.0"
+  optional:
+    ':development':
+      - gem: puppet_litmus
+        git: https://github.com/puppetlabs/puppet_litmus
+        ref: main
+        condition: Gem::Version.new(RUBY_VERSION.dup) >= Gem::Version.new('2.5.0')
