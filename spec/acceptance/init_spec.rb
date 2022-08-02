@@ -3,22 +3,22 @@ require 'spec_helper_acceptance'
 describe 'pam_pkcs11' do
   fixture_path = File.expand_path(File.join(__FILE__, '..', '..', 'fixtures'))
 
-  case fact('os')['family']
+  case host_inventory['facter']['os']['family']
   when 'Gentoo'
     package_name = 'sys-auth/pam_pkcs11'
     os_files_path = 'Gentoo'
   when 'Debian'
     package_name = 'libpam-pkcs11'
-    os_files_path = case fact('os')['name']
+    os_files_path = case host_inventory['facter']['os']['name']
                     when 'Debian'
-                      case fact('os')['release']['major']
+                      case host_inventory['facter']['os']['release']['major']
                       when '7', '8'
                         'Debian-old'
                       else
                         'Debian'
                       end
                     when 'Ubuntu'
-                      case fact('os')['release']['major']
+                      case host_inventory['facter']['os']['release']['major']
                       when '12.04', '14.04'
                         'Debian-old'
                       else
@@ -29,17 +29,17 @@ describe 'pam_pkcs11' do
                     end
   when 'RedHat', 'Suse'
     package_name = 'pam_pkcs11'
-    os_files_path = if fact('os')['architecture'].match?(%r{i[3-6]86})
-                      fact('os')['release']['major'] == 5 ? ['RedHat', '32', 'RedHat-5'] : ['RedHat', '32']
+    os_files_path = if host_inventory['facter']['os']['architecture'].match?(%r{i[3-6]86})
+                      host_inventory['facter']['os']['release']['major'] == 5 ? ['RedHat', '32', 'RedHat-5'] : ['RedHat', '32']
                     else
-                      fact('os')['release']['major'] == 5 ? ['RedHat', '64', 'RedHat-5'] : ['RedHat', '64']
+                      host_inventory['facter']['os']['release']['major'] == 5 ? ['RedHat', '64', 'RedHat-5'] : ['RedHat', '64']
                     end
   end
 
   default_pam_pkcs11_conf = File.open(File.join(fixture_path, 'default_files', os_files_path, 'pam_pkcs11.conf')).read
   default_pkcs11_eventmgr_conf = File.open(File.join(fixture_path, 'default_files', os_files_path, 'pkcs11_eventmgr.conf')).read
 
-  if fact('os')['family'] == 'Debian'
+  if host_inventory['facter']['os']['family'] == 'Debian'
     default_pam_config_pkcs11 = File.open(File.join(fixture_path, 'default_files', os_files_path, 'pam-config.conf')).read
   end
 
@@ -80,7 +80,7 @@ describe 'pam_pkcs11' do
       its(:content) { is_expected.to match(default_pkcs11_eventmgr_conf) }
     end
 
-    if fact('os')['family'] == 'Debian'
+    if host_inventory['facter']['os']['family'] == 'Debian'
       describe file('/usr/share/pam-configs') do
         it { is_expected.to be_directory }
         it { is_expected.to be_owned_by 'root' }
@@ -106,7 +106,7 @@ describe 'pam_pkcs11' do
       }
       END
 
-      if fact('os')['family'] == 'RedHat'
+      if host_inventory['facter']['os']['family'] == 'RedHat'
         it 'must fail without making any changes' do
           apply_manifest(manifest, expect_failures: true, acceptable_exit_codes: [4])
         end
