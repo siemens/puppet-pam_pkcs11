@@ -255,11 +255,13 @@ class pam_pkcs11 (
   Array[Stdlib::Filesource]    $ca_dir_source          = [],
   Enum[
     'first',
-  'all']                       $ca_dir_sourceselect    = 'first',
+    'all'                                                           # lint:ignore:trailing_comma
+  ]                            $ca_dir_sourceselect    = 'first',
   Boolean                      $manage_pkcs11_eventmgr = true,
   Enum[
     'pam-auth-update',
-  'none']                      $pam_config             = $pam_pkcs11::params::pam_config,
+    'none'                                                          # lint:ignore:trailing_comma
+  ]                            $pam_config             = $pam_pkcs11::params::pam_config,
 ) inherits pam_pkcs11::params {
   if $ca_dir_source != [] and $facts['os']['family'] == 'RedHat' { fail('The `ca_dir_source` parameter is not supported on RedHat OS families.') }
 
