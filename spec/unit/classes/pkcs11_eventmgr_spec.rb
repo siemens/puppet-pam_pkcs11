@@ -85,20 +85,20 @@ describe 'pam_pkcs11::pkcs11_eventmgr', type: :class do
           case facts[:os]['name']
           when 'RedHat', 'CentOS', 'Scientific', 'OracleLinux'
             case facts[:os]['release']['major']
-            when '7'
-              it_behaves_like('an OS that uses systemd by default')
-            else
+            when '6'
               it_behaves_like('an OS that does not use systemd by default')
+            else
+              it_behaves_like('an OS that uses systemd by default')
             end
           when 'Fedora'
             it_behaves_like('an OS that uses systemd by default')
           end
         when 'Suse'
           case facts[:os]['release']['major']
-          when '12', '13', '42'
-            it_behaves_like('an OS that uses systemd by default')
-          else
+          when '11'
             it_behaves_like('an OS that does not use systemd by default')
+          else
+            it_behaves_like('an OS that uses systemd by default')
           end
         end
 
