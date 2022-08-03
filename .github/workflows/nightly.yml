@@ -59,7 +59,7 @@ jobs:
       if: ${{ github.repository_owner == 'siemens' }}
       run: |
         if [ '${{ github.repository_owner }}' == 'siemens' ]; then
-          buildevents cmd $TRACE_ID $STEP_ID matrix_from_metadata -- bundle exec matrix_from_metadata_v2 
+          buildevents cmd $TRACE_ID $STEP_ID matrix_from_metadata -- bundle exec matrix_from_metadata_v2 --exclude-platforms '["RedHat-7", "SLES-12", "SLES-15"]'
         else
           echo  "::set-output name=matrix::{}"
         fi

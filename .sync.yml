@@ -19,8 +19,16 @@ appveyor.yml:
   delete: true
 .github/workflows/nightly.yml:
   unmanaged: false
+  exclude_platforms:
+    - RedHat-7
+    - SLES-12
+    - SLES-15
 .github/workflows/pr_test.yml:
   unmanaged: false
+  exclude_platforms:
+    - RedHat-7
+    - SLES-12
+    - SLES-15
 .github/workflows/auto_release.yml:
   unmanaged: false
 .github/workflows/spec.yml:
