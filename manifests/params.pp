@@ -97,8 +97,8 @@ class pam_pkcs11::params {
           default => ['signature', 'ca', 'crl_auto', 'ocsp_on'],
         }
         $systemd = $facts['os']['release']['major'] ? {
-          '7'     => true,
-          default => false,
+          '6'     => false,
+          default => true,
         }
       } elsif $facts['os']['family'] == 'Suse' {
         $cert_policy = ['signature', 'ca', 'crl_auto', 'ocsp_on']
