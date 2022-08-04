@@ -33,15 +33,20 @@ appveyor.yml:
   unmanaged: false
 .github/workflows/spec.yml:
   unmanaged: false
+  checks: markdownlint validate lint check rubocop
 .github/workflows/release.yml:
   unmanaged: false
 Rakefile:
   linter_fail_on_warnings: true
+  extras:
+    - "import 'Rakefile.local'"
 Gemfile:
   required:
     ':development':
       - gem: pdk
         version: "~> 2.5.0"
+      - gem: mdl
+        version: "~> 0.11.0"
   optional:
     ':development':
       - gem: puppet_litmus

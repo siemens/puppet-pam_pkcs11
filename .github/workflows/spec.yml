@@ -57,7 +57,7 @@ jobs:
       - name: Run Static & Syntax Tests
         if: ${{ github.repository_owner == 'siemens' }}
         run: |
-          buildevents cmd $TRACE_ID $STEP_ID 'static_syntax_checks' -- bundle exec rake validate lint check rubocop
+          buildevents cmd $TRACE_ID $STEP_ID 'static_syntax_checks' -- bundle exec rake markdownlint validate lint check rubocop
 
       - name: Setup Spec Test Matrix
         id: get-matrix
