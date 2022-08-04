@@ -6,7 +6,7 @@ and other PKCS #11 cryptographic modules.
 
 [OpenSC project]: https://github.com/OpenSC/OpenSC/wiki
 
-## Table of Contents
+## Table of contents
 
 1. [Setup - The basics of getting started with pam_pkcs11](#setup)
   * [What pam_pkcs11 affects](#what-pam_pkcs11-affects)
@@ -27,7 +27,7 @@ with their certificates. It can also manage some aspects of the session lock
 policy through the configuration of the `pkcs11_eventmgr(8)` daemon, part of the
 *pam_pkcs11* package.
 
-### Setup Requirements
+### Setup requirements
 
 #### PAM stack configuration
 
@@ -49,7 +49,7 @@ pam_pkcs11 documentation][2] for further details.
 
 ### Beginning with `pam_pkcs11`
 
-By default this module will install *pam_pkcs11* and configure it to use the
+By default, this module will install *pam_pkcs11* and configure it to use the
 OpenSC PKCS#11 module, checking user certificates against a certificate
 authority (CA) trust store, and the certificates contained on a PKCS#11 token
 to users based on the SHA-1 certificate fingerprints (via the *[digest
@@ -68,17 +68,17 @@ class { 'pam_pkcs11':
 }
 ```
 
-Handling CA certificates is more difficult because depending on the
-cryptographic backend they are stored differently. The most common back-end
+Handling CA certificates is more difficult, because they are stored differently
+depending on the cryptographic backend. The most common back-end
 options are NSS and OpenSSL. Unfortunately, this module does not currently
 support NSS database storage. See the [Limitations section](#limitations)
 below for more details.
 
 For Debian-based systems, the parameters `ca_dir_source` and
 `ca_dir_sourceselect` provide a way to specify CA file sources for the OpenSSL
-hash dir back-end. The parameters are simply passed on to a puppet file
+hash dir back-end. The parameters are simply passed on to a Puppet file
 resource, as `source` and `sourceselect` with the caveat that `ca_source_dir`
-has to be an array of strings. See the puppet documentation about the
+has to be an array of strings. See the Puppet documentation about the
 [file](https://puppet.com/docs/puppet/7/types/file.html) resource for more
 information.
 
@@ -115,13 +115,13 @@ via the `pam_pkcs11::manage_pkcs11_eventmgr` parameter.
 
 ### Classes
 
-#### Public Classes
+#### Public classes
 
 * [`pam_pkcs11`](#pam_pkcs11-class): The primary point of entry to this module.
 * [`pam_pkcs11::pkcs11_eventmgr`](#pam_pkcs11pkcs11_eventmgr-class):
   Manages `pkcs11_eventmgr(1)`, the session lock helper daemon.
 
-#### Private Classes
+#### Private classes
 
 * `pam_pkcs11::install`: Manages installation of the *pam_pkcs11* package.
 * `pam_pkcs11::config`: Manages configuration of the various configuration files.
@@ -327,7 +327,7 @@ This option defines if the
 
 Please see the disclaimer of liability in the [`LICENSE`](LICENSE) file.
 
-### Operating System Compatibility
+### Operating system compatibility
 
 Although no guarantees can be made, this module is designed to work on the
 following operating systems:
@@ -340,7 +340,7 @@ following operating systems:
 * Debian 9, 10 and 11
 * SUSE Linux Enterprise Server 12 and 15
 
-### Puppet Stack Compatibility
+### Puppet stack compatibility
 
 This module is tested with the following software. For complete details see
 the GitHub actions configuration.
@@ -376,8 +376,6 @@ supported on the `RedHat` OS family due to a missing script.
     pre-downloaded CRLS and `crl_offline` in the `cert_policy` to skip the
     signature verification of the CRLs; it is still a good idea to check the
     signatures upon download.
-
-### TODO
 
 [3]: https://github.com/OpenSC/pam_pkcs11/blob/pam_pkcs11-0.6.12/etc/pam_pkcs11.conf.example.in
 [4]: https://github.com/OpenSC/pam_pkcs11/blob/pam_pkcs11-0.6.12/etc/digest_mapping.example
