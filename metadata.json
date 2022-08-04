@@ -1,12 +1,12 @@
 {
-  "name": "lamawithonel-pam_pkcs11",
+  "name": "siemens-pam_pkcs11",
   "version": "0.1.0",
-  "author": "Lucas Yamanishi <lucas.yamanishi@gmail.com>",
+  "author": "siemens",
   "summary": "Manages pam_pkcs11",
   "license": "Apache-2.0",
-  "source": "https://github.com/lamawithonel/puppet-pam_pkcs11.git",
-  "project_page": "https://github.com/lamawithonel/puppet-pam_pkcs11",
-  "issues_url": "https://github.com/lamawithonel/puppet-pam_pkcs11/issues",
+  "source": "https://github.com/siemens/puppet-pam_pkcs11.git",
+  "project_page": "https://github.com/siemens/puppet-pam_pkcs11",
+  "issues_url": "https://github.com/siemens/puppet-pam_pkcs11/issues",
   "dependencies": [
     {
       "name": "puppetlabs/stdlib",
