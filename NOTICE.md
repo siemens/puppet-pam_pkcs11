@@ -12,7 +12,6 @@ to his [puppet-module-skeleton] project as well as authors of the
 
 [puppet-module-skeleton]: https://github.com/garethr/puppet-module-skeleton
 
-
 [pdk-template]: https://github.com/puppetlabs/pdk-templates
 
 ---
