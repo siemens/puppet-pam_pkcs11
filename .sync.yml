@@ -23,6 +23,7 @@ appveyor.yml:
     - RedHat-7
     - SLES-12
     - SLES-15
+  slack-notifications: false
 .github/workflows/pr_test.yml:
   unmanaged: false
   exclude_platforms:
