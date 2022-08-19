@@ -28,7 +28,6 @@ class pam_pkcs11::params {
       # Ubuntu 18.04 uses version 0.6.9
       # Ubuntu 20.04 uses version 0.6.11
       $package_name       = 'libpam-pkcs11'
-      $mapper_module_dir  = '/lib/pam_pkcs11'
       $ca_dir             = '/etc/pam_pkcs11/cacerts'
       $nss_dir            = undef
       $cert_policy        = ['signature', 'ca', 'crl_auto']
@@ -42,6 +41,9 @@ class pam_pkcs11::params {
       $module_path_old = '/usr/lib/opensc-pkcs11.so'
       $module_path_new = "/usr/lib/${gcc_arch}-linux-gnu/pkcs11/opensc-pkcs11.so"
 
+      $mapper_module_path_old = '/lib/pam_pkcs11'
+      $mapper_module_path_new = "/lib/${gcc_arch}-linux-gnu/pam_pkcs11"
+
       case $facts['os']['name'] {
         'Debian': {
           $systemd = $facts['os']['release']['major'] ? {
@@ -49,28 +51,27 @@ class pam_pkcs11::params {
             default => true,
           }
           $opensc_module_path = $facts['os']['release']['major'] ? {
-            '7' => $module_path_old,
-            '8' => $module_path_old,
-            '9' => $module_path_new,
-            '10' => $module_path_new,
-            '11' => $module_path_new,
-            default => fail("${facts['os']['release']['major']} of ${facts['os']['name']} not supported")
+            /(7|8)/     => $module_path_old,
+            /(9|10|11)/ => $module_path_new,
+            default     => fail("${facts['os']['release']['major']} of ${facts['os']['name']} not supported")
+          }
+          $mapper_module_dir  = $facts['os']['release']['major'] ? {
+            /(7|8|9|10)/ => $mapper_module_path_old,
+            '11'         => $mapper_module_path_new,
+            default      => fail("${facts['os']['release']['major']} of ${facts['os']['name']} not supported")
           }
         }
         'Ubuntu': {
           $systemd = $facts['os']['release']['major'] ? {
-            '12.04' => false,
-            '14.04' => false,
-            default => true,
+            /(12\.04|14\.04)/ => false,
+            default           => true,
           }
           $opensc_module_path = $facts['os']['release']['major'] ? {
-            '12.04' => $module_path_old,
-            '14.04' => $module_path_old,
-            '16.04' => $module_path_new,
-            '18.04' => $module_path_new,
-            '20.04' => $module_path_new,
-            default => fail("${facts['os']['release']['major']} of ${facts['os']['name']} not supported")
+            /(12\.04|14\.04)/        => $module_path_old,
+            /(16\.04|18\.04|20\.04)/ => $module_path_new,
+            default                  => fail("${facts['os']['release']['major']} of ${facts['os']['name']} not supported")
           }
+          $mapper_module_dir = $mapper_module_path_old
         }
         default: { fail("${facts['os']['name']} not supported") }
       }
