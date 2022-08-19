@@ -14,6 +14,8 @@ describe 'pam_pkcs11' do
                       case host_inventory['facter']['os']['release']['major']
                       when '7', '8'
                         'Debian-old'
+                      when '11'
+                        'Debian11'
                       else
                         'Debian'
                       end

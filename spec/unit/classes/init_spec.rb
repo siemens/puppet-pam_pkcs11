@@ -30,6 +30,8 @@ describe 'pam_pkcs11', type: :class do
             case facts[:os]['release']['major']
             when '7', '8'
               'Debian-old'
+            when '11'
+              'Debian11'
             else
               'Debian'
             end

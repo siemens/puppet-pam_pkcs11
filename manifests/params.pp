@@ -28,7 +28,6 @@ class pam_pkcs11::params {
       # Ubuntu 18.04 uses version 0.6.9
       # Ubuntu 20.04 uses version 0.6.11
       $package_name       = 'libpam-pkcs11'
-      $mapper_module_dir  = '/lib/pam_pkcs11'
       $ca_dir             = '/etc/pam_pkcs11/cacerts'
       $nss_dir            = undef
       $cert_policy        = ['signature', 'ca', 'crl_auto']
@@ -41,6 +40,9 @@ class pam_pkcs11::params {
 
       $module_path_old = '/usr/lib/opensc-pkcs11.so'
       $module_path_new = "/usr/lib/${gcc_arch}-linux-gnu/pkcs11/opensc-pkcs11.so"
+
+      $mapper_module_path_old = '/lib/pam_pkcs11'
+      $mapper_module_path_new = "/lib/${gcc_arch}-linux-gnu/pam_pkcs11"
 
       case $facts['os']['name'] {
         'Debian': {
@@ -55,6 +57,11 @@ class pam_pkcs11::params {
             '10' => $module_path_new,
             '11' => $module_path_new,
             default => fail("${facts['os']['release']['major']} of ${facts['os']['name']} not supported")
+          }
+          $mapper_module_dir  = $facts['os']['release']['major'] ? {
+            /(7|8|9|10)/ => $mapper_module_path_old,
+            '11'         => $mapper_module_path_new,
+            default      => fail("${facts['os']['release']['major']} of ${facts['os']['name']} not supported")
           }
         }
         'Ubuntu': {
@@ -71,6 +78,7 @@ class pam_pkcs11::params {
             '20.04' => $module_path_new,
             default => fail("${facts['os']['release']['major']} of ${facts['os']['name']} not supported")
           }
+          $mapper_module_dir = $mapper_module_path_old
         }
         default: { fail("${facts['os']['name']} not supported") }
       }
