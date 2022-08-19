@@ -51,12 +51,9 @@ class pam_pkcs11::params {
             default => true,
           }
           $opensc_module_path = $facts['os']['release']['major'] ? {
-            '7' => $module_path_old,
-            '8' => $module_path_old,
-            '9' => $module_path_new,
-            '10' => $module_path_new,
-            '11' => $module_path_new,
-            default => fail("${facts['os']['release']['major']} of ${facts['os']['name']} not supported")
+            /(7|8)/     => $module_path_old,
+            /(9|10|11)/ => $module_path_new,
+            default     => fail("${facts['os']['release']['major']} of ${facts['os']['name']} not supported")
           }
           $mapper_module_dir  = $facts['os']['release']['major'] ? {
             /(7|8|9|10)/ => $mapper_module_path_old,
@@ -66,17 +63,13 @@ class pam_pkcs11::params {
         }
         'Ubuntu': {
           $systemd = $facts['os']['release']['major'] ? {
-            '12.04' => false,
-            '14.04' => false,
-            default => true,
+            /(12\.04|14\.04)/ => false,
+            default           => true,
           }
           $opensc_module_path = $facts['os']['release']['major'] ? {
-            '12.04' => $module_path_old,
-            '14.04' => $module_path_old,
-            '16.04' => $module_path_new,
-            '18.04' => $module_path_new,
-            '20.04' => $module_path_new,
-            default => fail("${facts['os']['release']['major']} of ${facts['os']['name']} not supported")
+            /(12\.04|14\.04)/        => $module_path_old,
+            /(16\.04|18\.04|20\.04)/ => $module_path_new,
+            default                  => fail("${facts['os']['release']['major']} of ${facts['os']['name']} not supported")
           }
           $mapper_module_dir = $mapper_module_path_old
         }
