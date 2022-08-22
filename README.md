@@ -9,9 +9,9 @@ and other PKCS #11 cryptographic modules.
 ## Table of contents
 
 1. [Setup - The basics of getting started with pam_pkcs11](#setup)
-  * [What pam_pkcs11 affects](#what-pam_pkcs11-affects)
-  * [Setup requirements](#setup-requirements)
-  * [Beginning with pam_pkcs11](#beginning-with-pam_pkcs11)
+    * [What pam_pkcs11 affects](#what-pam_pkcs11-affects)
+    * [Setup requirements](#setup-requirements)
+    * [Beginning with pam_pkcs11](#beginning-with-pam_pkcs11)
 1. [Usage - Configuration options and additional functionality](#usage)
 1. [Reference - An under-the-hood peek at what the module is doing and how](#reference)
 1. [Limitations - OS compatibility, etc.](#limitations)
@@ -346,12 +346,12 @@ This module is tested with the following software. For complete details see
 the GitHub actions configuration.
 
 * Puppet
-  * 6.27
-  * 7.17
+    * 6.27
+    * 7.17
 * Ruby
-  * 2.5
-  * 2.6
-  * 2.7
+    * 2.5
+    * 2.6
+    * 2.7
 
 ### CA certificate storage
 
