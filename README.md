@@ -69,14 +69,14 @@ class { 'pam_pkcs11':
 ```
 
 Handling CA certificates is more difficult, because they are stored differently
-depending on the cryptographic backend. The most common back-end
+depending on the cryptographic back-end. The most common back-end
 options are NSS and OpenSSL. Unfortunately, this module does not currently
 support NSS database storage. See the [Limitations section](#limitations)
 below for more details.
 
 For Debian-based systems, the parameters `ca_dir_source` and
 `ca_dir_sourceselect` provide a way to specify CA file sources for the OpenSSL
-hash dir back-end. The parameters are simply passed on to a Puppet file
+hash directory back-end. The parameters are simply passed on to a Puppet file
 resource, as `source` and `sourceselect` with the caveat that `ca_source_dir`
 has to be an array of strings. See the Puppet documentation about the
 [file](https://puppet.com/docs/puppet/7/types/file.html) resource for more
@@ -315,7 +315,7 @@ can still be overwritten by any settings in
 
 This defines how the `pkcs11_eventmgr` service is started. Currently only
 `systemd_service` and `xdg_autostart` is supported. Choose `none` in case the
-autostart of the daemon is configured elsewhere.
+auto-start of the daemon is configured elsewhere.
 
 ##### `pam_pkcs11::pkcs11_eventmgr::lock_screen_on_card_removal`
 
@@ -361,9 +361,9 @@ is Joshua Hoblitt's [nsstools module]; however, due to limitations in `certutil`
 it cannot currently handle multiple certificates with the same subject, a
 scenario commonly used for large-scale intermediate CAs.
 
-On systems using non-NSS CA storage (OpenSSL hash dirs), the module provides
-the `ca_dir_source` and `ca_dir_sourceselect` parameters; however, they are not
-supported on the `RedHat` OS family due to a missing script.
+On systems using non-NSS CA storage (OpenSSL hash directories), the module
+provides the `ca_dir_source` and `ca_dir_sourceselect` parameters; however,
+they are not supported on the `RedHat` OS family due to a missing script.
 
 [nsstools module]: https://github.com/jhoblitt/puppet-nsstools
 
@@ -373,7 +373,7 @@ supported on the `RedHat` OS family due to a missing script.
 
     If there are multiple trusted CAs with the same subject, online CRL checks
     may fail during CRL signature verification. The workaround is to use
-    pre-downloaded CRLS and `crl_offline` in the `cert_policy` to skip the
+    pre-downloaded CRLs and `crl_offline` in the `cert_policy` to skip the
     signature verification of the CRLs; it is still a good idea to check the
     signatures upon download.
 
