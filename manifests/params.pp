@@ -16,68 +16,47 @@ class pam_pkcs11::params {
       $systemd            = false # by default
       $pam_config         = 'none'
     } # end osfamily Gentoo
+
     'Debian': {
-      # Debian 7 uses version 0.6.8
-      # Debian 8 uses version 0.6.8
       # Debian 9 uses version 0.6.9
       # Debian 10 uses version 0.6.9
       # Debian 11 uses version 0.6.11
-      # Ubuntu 12.04 uses version 0.6.7
-      # Ubuntu 14.04 uses version 0.6.8
-      # Ubuntu 16.04 uses version 0.6.8
       # Ubuntu 18.04 uses version 0.6.9
       # Ubuntu 20.04 uses version 0.6.11
-      $package_name       = 'libpam-pkcs11'
-      $ca_dir             = '/etc/pam_pkcs11/cacerts'
-      $nss_dir            = undef
-      $cert_policy        = ['signature', 'ca', 'crl_auto']
-      $pam_config         = 'pam-auth-update'
+      $package_name = 'libpam-pkcs11'
+      $ca_dir       = '/etc/pam_pkcs11/cacerts'
+      $nss_dir      = undef
+      $cert_policy  = ['signature', 'ca', 'crl_auto']
+      $pam_config   = 'pam-auth-update'
+      $systemd      = true
 
       $gcc_arch = $facts['os']['architecture'] ? {
         'amd64' => 'x86_64',
         default  => $facts['os']['architecture']
       }
+      $opensc_module_path = "/usr/lib/${gcc_arch}-linux-gnu/pkcs11/opensc-pkcs11.so"
 
-      $module_path_old = '/usr/lib/opensc-pkcs11.so'
-      $module_path_new = "/usr/lib/${gcc_arch}-linux-gnu/pkcs11/opensc-pkcs11.so"
-
-      $mapper_module_path_old = '/lib/pam_pkcs11'
-      $mapper_module_path_new = "/lib/${gcc_arch}-linux-gnu/pam_pkcs11"
+      $mapper_module_dir_old = '/lib/pam_pkcs11'
+      $mapper_module_dir_new = "/lib/${gcc_arch}-linux-gnu/pam_pkcs11"
 
       case $facts['os']['name'] {
         'Debian': {
-          $systemd = $facts['os']['release']['major'] ? {
-            '7'     => false,
-            default => true,
-          }
-          $opensc_module_path = $facts['os']['release']['major'] ? {
-            /(7|8)/     => $module_path_old,
-            /(9|10|11)/ => $module_path_new,
-            default     => fail("${facts['os']['release']['major']} of ${facts['os']['name']} not supported")
-          }
-          $mapper_module_dir  = $facts['os']['release']['major'] ? {
-            /(7|8|9|10)/ => $mapper_module_path_old,
-            '11'         => $mapper_module_path_new,
-            default      => fail("${facts['os']['release']['major']} of ${facts['os']['name']} not supported")
+          $mapper_module_dir = $facts['os']['release']['major'] ? {
+            /(9|10)/ => $mapper_module_dir_old,
+            default  => $mapper_module_dir_new,
           }
         }
         'Ubuntu': {
-          $systemd = $facts['os']['release']['major'] ? {
-            /(12\.04|14\.04)/ => false,
-            default           => true,
+          $mapper_module_dir = $facts['os']['release']['major'] ? {
+            /(18\.04|20\.04)/ => $mapper_module_dir_old,
+            default           => $mapper_module_dir_new,
           }
-          $opensc_module_path = $facts['os']['release']['major'] ? {
-            /(12\.04|14\.04)/        => $module_path_old,
-            /(16\.04|18\.04|20\.04)/ => $module_path_new,
-            default                  => fail("${facts['os']['release']['major']} of ${facts['os']['name']} not supported")
-          }
-          $mapper_module_dir = $mapper_module_path_old
         }
         default: { fail("${facts['os']['name']} not supported") }
       }
-    }
+    } # end osfamily Debian
+
     'RedHat', 'Suse': {
-      # RHEL 5 uses version 0.5.3
       # RHEL 6 uses version 0.6.2
       # RHEL 7 uses version 0.6.2
       $lib = $facts['os']['architecture'] ? {
@@ -90,28 +69,16 @@ class pam_pkcs11::params {
       $mapper_module_dir  = "/usr/${lib}/pam_pkcs11"
       $ca_dir             = undef
       $nss_dir            = '/etc/pki/nssdb'
+      $cert_policy        = ['signature', 'ca', 'crl_auto', 'ocsp_on']
       $pam_config         = 'none'
 
-      if $facts['os']['name'] =~ /RedHat|CentOS|Scientific|OracleLinux/ {
-        $cert_policy = $facts['os']['release']['major'] ? {
-          '5'     => ['signature', 'ca', 'crl_auto'],
-          default => ['signature', 'ca', 'crl_auto', 'ocsp_on'],
-        }
-        $systemd = $facts['os']['release']['major'] ? {
-          '6'     => false,
-          default => true,
-        }
-      } elsif $facts['os']['family'] == 'Suse' {
-        $cert_policy = ['signature', 'ca', 'crl_auto', 'ocsp_on']
-        $systemd = $facts['os']['release']['major'] ? {
-          '11'    => false,
-          default => true,
-        }
+      if $facts['os']['name'] =~ /RedHat|CentOS|Scientific|OracleLinux/ and $facts['os']['release']['major'] == '6' {
+        $systemd = false
       } else {
-        $cert_policy = ['signature', 'ca', 'crl_auto', 'ocsp_on']
         $systemd = true
       }
-    }
+    } # end osfamily RedHat, Suse
+
     default: { fail("${facts['os']['name']} not supported") }
   }
 
