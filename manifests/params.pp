@@ -23,6 +23,7 @@ class pam_pkcs11::params {
       # Debian 11 uses version 0.6.11
       # Ubuntu 18.04 uses version 0.6.9
       # Ubuntu 20.04 uses version 0.6.11
+      # Ubuntu 22.04 uses version 0.6.11
       $package_name = 'libpam-pkcs11'
       $ca_dir       = '/etc/pam_pkcs11/cacerts'
       $nss_dir      = undef
