@@ -263,7 +263,9 @@ class pam_pkcs11 (
     'none'                                                          # lint:ignore:trailing_comma
   ]                            $pam_config             = $pam_pkcs11::params::pam_config,
 ) inherits pam_pkcs11::params {
-  if $ca_dir_source != [] and $facts['os']['family'] == 'RedHat' { fail('The `ca_dir_source` parameter is not supported on RedHat OS families.') }
+  if $ca_dir_source != [] and $facts['os']['family'] == 'RedHat' {
+    fail('The `ca_dir_source` parameter is not supported on RedHat OS families.')
+  }
 
   $merged_pkcs11_module  = merge($pkcs11_module_base, $pkcs11_module)
   $merged_mapper_options = deep_merge($mapper_options_base, $mapper_options)
