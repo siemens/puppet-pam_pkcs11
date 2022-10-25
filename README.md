@@ -337,7 +337,7 @@ following operating systems:
 * Scientific Linux 6 and 7
 * Oracle Linux 6 and 7
 * Ubuntu 18.04 and 20.04
-* Debian 9, 10 and 11
+* Debian 10 and 11
 * SUSE Linux Enterprise Server 12 and 15
 
 ### Puppet stack compatibility

@@ -18,7 +18,6 @@ class pam_pkcs11::params {
     } # end osfamily Gentoo
 
     'Debian': {
-      # Debian 9 uses version 0.6.9
       # Debian 10 uses version 0.6.9
       # Debian 11 uses version 0.6.11
       # Ubuntu 18.04 uses version 0.6.9
@@ -43,7 +42,7 @@ class pam_pkcs11::params {
       case $facts['os']['name'] {
         'Debian': {
           $mapper_module_dir = $facts['os']['release']['major'] ? {
-            /(9|10)/ => $mapper_module_dir_old,
+            /10/ => $mapper_module_dir_old,
             default  => $mapper_module_dir_new,
           }
         }
