@@ -336,7 +336,7 @@ following operating systems:
 * CentOS 6 and 7
 * Scientific Linux 6 and 7
 * Oracle Linux 6 and 7
-* Ubuntu 18.04 and 20.04
+* Ubuntu 18.04, 20.04, and 22.04
 * Debian 10 and 11
 * SUSE Linux Enterprise Server 12 and 15
 
