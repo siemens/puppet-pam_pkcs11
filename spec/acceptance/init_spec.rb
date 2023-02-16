@@ -12,19 +12,15 @@ describe 'pam_pkcs11' do
     os_files_path = case host_inventory['facter']['os']['name']
                     when 'Debian'
                       case host_inventory['facter']['os']['release']['major']
-                      when '7', '8'
+                      when '9', '10'
                         'Debian-old'
-                      when '11'
-                        'Debian11'
                       else
                         'Debian'
                       end
                     when 'Ubuntu'
                       case host_inventory['facter']['os']['release']['major']
-                      when '12.04', '14.04'
+                      when '18.04', '20.04'
                         'Debian-old'
-                      when '22.04'
-                        'Debian11'
                       else
                         'Debian'
                       end
@@ -34,9 +30,9 @@ describe 'pam_pkcs11' do
   when 'RedHat', 'Suse'
     package_name = 'pam_pkcs11'
     os_files_path = if host_inventory['facter']['os']['architecture'].match?(%r{i[3-6]86})
-                      host_inventory['facter']['os']['release']['major'] == 5 ? ['RedHat', '32', 'RedHat-5'] : ['RedHat', '32']
+                      ['RedHat', '32']
                     else
-                      host_inventory['facter']['os']['release']['major'] == 5 ? ['RedHat', '64', 'RedHat-5'] : ['RedHat', '64']
+                      ['RedHat', '64']
                     end
   end
 

@@ -28,19 +28,15 @@ describe 'pam_pkcs11', type: :class do
           case facts[:os]['name']
           when 'Debian'
             case facts[:os]['release']['major']
-            when '7', '8'
+            when '9', '10'
               'Debian-old'
-            when '11'
-              'Debian11'
             else
               'Debian'
             end
           when 'Ubuntu'
             case facts[:os]['release']['major']
-            when '12.04', '14.04'
+            when '18.04', '20.04'
               'Debian-old'
-            when '22.04'
-              'Debian11'
             else
               'Debian'
             end
@@ -49,9 +45,9 @@ describe 'pam_pkcs11', type: :class do
           end
         when 'RedHat', 'Suse'
           if facts[:os].fetch('architecture', facts[:architecture]).match?(%r{i[3-6]86})
-            facts[:os]['release']['major'] == '5' ? ['RedHat', '32', 'RedHat-5'] : ['RedHat', '32']
+            ['RedHat', '32']
           else
-            facts[:os]['release']['major'] == '5' ? ['RedHat', '64', 'RedHat-5'] : ['RedHat', '64']
+            ['RedHat', '64']
           end
         end
       end
