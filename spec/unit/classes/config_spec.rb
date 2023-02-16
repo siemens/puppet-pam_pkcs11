@@ -28,6 +28,8 @@ describe 'pam_pkcs11::config', type: :class do
             case facts[:os]['release']['major']
             when '12.04', '14.04'
               'Debian-old'
+            when '22.04'
+              'Debian11'
             else
               'Debian'
             end
