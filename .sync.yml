@@ -45,12 +45,6 @@ Gemfile:
   required:
     ':development':
       - gem: pdk
-        version: "~> 2.5.0"
+        version: "~> 2.6.1"
       - gem: mdl
         version: "~> 0.11.0"
-  optional:
-    ':development':
-      - gem: puppet_litmus
-        git: https://github.com/puppetlabs/puppet_litmus
-        ref: main
-        condition: Gem::Version.new(RUBY_VERSION.dup) >= Gem::Version.new('2.5.0')
