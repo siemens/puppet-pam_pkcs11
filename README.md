@@ -343,11 +343,10 @@ following operating systems:
 ### Puppet stack compatibility
 
 This module is tested with the following software. For complete details see
-the GitHub actions configuration.
+[`metadata.json`](metadata.json) and the [GitHub actions configuration](.github/workflows/).
 
 * Puppet
-    * 6.27
-    * 7.17
+    * 7
 * Ruby
     * 2.5
     * 2.6
